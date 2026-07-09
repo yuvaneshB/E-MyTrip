@@ -10,7 +10,7 @@ const getDefaultApiUrl = () => {
   } catch (e) {
     // Fallback if window is not defined
   }
-  return 'https://exploremytrip.onrender.com/api/v1';
+  return 'https://e-mytrip.onrender.com/api/v1';
 };
 
 const getApiBaseUrl = () => {

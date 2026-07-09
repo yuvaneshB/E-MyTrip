@@ -19,7 +19,7 @@ const getBaseApiUrl = () => {
       return `${cleanProtocol}//${hostname}:4000/api`;
     }
   } catch (e) {}
-  return 'https://exploremytrip.onrender.com/api';
+  return 'https://e-mytrip.onrender.com/api';
 };
 
 const BASE_URL = getBaseApiUrl();

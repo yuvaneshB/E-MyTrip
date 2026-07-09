@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import api from '../services/api.js';
+import api, { getBackendUrl } from '../services/api.js';
 import { Download, FileText, Activity } from 'lucide-react';
 
 export const InvoicesPage = () => {
@@ -71,7 +71,7 @@ export const InvoicesPage = () => {
                   <td className="p-4"><span className="bg-emerald-500/10 text-emerald-600 px-2 py-0.5 rounded border border-emerald-500/20 font-semibold">{inv.status}</span></td>
                   <td className="p-4">
                     <button
-                      onClick={() => window.open(`https://exploremytrip.onrender.com${inv.pdfPath || inv.path}`)}
+                      onClick={() => window.open(`${getBackendUrl()}${inv.pdfPath || inv.path}`)}
                       className="flex items-center gap-1.5 hover:text-gold-600 transition-colors text-slate-500 font-semibold cursor-pointer border-none bg-transparent"
                     >
                       <Download className="w-4 h-4" /> Download PDF

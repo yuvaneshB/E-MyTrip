@@ -500,7 +500,7 @@ const BookingDetailsPage = () => {
 
                 {invoice.pdfPath && (
                   <a
-                    href={`https://exploremytrip.onrender.com${invoice.pdfPath}`}
+                    href={`${getBackendUrl()}${invoice.pdfPath}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="px-4 py-2 bg-white hover:bg-slate-50 border border-slate-200 text-slate-650 font-bold text-xs rounded-xl flex items-center gap-1 transition-colors"

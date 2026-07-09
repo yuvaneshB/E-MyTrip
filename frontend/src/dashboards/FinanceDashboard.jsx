@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import api from '../services/api.js';
+import api, { getBackendUrl } from '../services/api.js';
 import Sidebar from '../components/Sidebar.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
 import {
@@ -94,7 +94,7 @@ const FinanceDashboard = () => {
       const res = await api.get('/reports/finance/export');
       if (res.data.success) {
         toast.success('Spreadsheet compiled successfully!');
-        window.open(`https://exploremytrip.onrender.com${res.data.downloadUrl}`);
+        window.open(`${getBackendUrl()}${res.data.downloadUrl}`);
       }
     } catch (err) {
       toast.error('Failed to export revenue sheet');
@@ -358,7 +358,7 @@ const FinanceDashboard = () => {
                             </td>
                             <td className="p-4">
                               <button
-                                onClick={() => window.open(`https://exploremytrip.onrender.com${inv.pdfPath || inv.path}`)}
+                                onClick={() => window.open(`${getBackendUrl()}${inv.pdfPath || inv.path}`)}
                                 className="flex items-center gap-1.5 hover:text-gold-600 transition-colors text-slate-500 font-semibold cursor-pointer border-none bg-transparent"
                               >
                                 <Download className="w-4 h-4" /> Download PDF

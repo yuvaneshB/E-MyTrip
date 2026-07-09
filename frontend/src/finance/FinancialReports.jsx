@@ -1,5 +1,5 @@
 import React from 'react';
-import api from '../services/api.js';
+import api, { getBackendUrl } from '../services/api.js';
 import toast from 'react-hot-toast';
 
 export const FinancialReports = () => {
@@ -8,7 +8,7 @@ export const FinancialReports = () => {
       const res = await api.get('/reports/finance/export');
       if (res.data.success) {
         toast.success('Spreadsheet compiled successfully!');
-        window.open(`https://exploremytrip.onrender.com${res.data.downloadUrl}`);
+        window.open(`${getBackendUrl()}${res.data.downloadUrl}`);
       }
     } catch (err) {
       toast.error('Failed to export revenue sheet');

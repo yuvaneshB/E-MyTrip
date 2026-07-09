@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import api from '../services/api.js';
+import api, { getBackendUrl } from '../services/api.js';
 import {
   DollarSign, FileSpreadsheet, Percent,
   ArrowDownLeft, CheckCircle2, AlertOctagon,
@@ -36,7 +36,7 @@ export const FinanceDashboard = () => {
       const res = await api.get('/reports/finance/export');
       if (res.data.success) {
         toast.success('Spreadsheet compiled successfully!');
-        window.open(`https://exploremytrip.onrender.com${res.data.downloadUrl}`);
+        window.open(`${getBackendUrl()}${res.data.downloadUrl}`);
       }
     } catch (err) {
       toast.error('Failed to export revenue sheet');
