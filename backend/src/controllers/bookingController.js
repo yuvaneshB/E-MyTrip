@@ -19,16 +19,7 @@ const getFrontendOrigin = (req) => {
   if (process.env.FRONTEND_URL) {
     return process.env.FRONTEND_URL.replace(/\/$/, '');
   }
-  // For development, find the active local network IP address fallback
-  const interfaces = os.networkInterfaces();
-  for (const interfaceName in interfaces) {
-    for (const iface of interfaces[interfaceName]) {
-      if (iface.family === 'IPv4' && !iface.internal) {
-        return `http://${iface.address}:5173`;
-      }
-    }
-  }
-  return 'http://localhost:5173';
+  return 'https://e-my-trip.vercel.app';
 };
 
 

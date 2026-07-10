@@ -62,14 +62,7 @@ export const uploadToCloudinary = async (filePath, folder = 'tours') => {
 
   if (!apiKey || apiKey.includes('mock_key')) {
     // If mock, return local file server path
-    let baseUrl = process.env.BACKEND_URL;
-    if (!baseUrl) {
-      if (process.env.NODE_ENV === 'development' || !process.env.NODE_ENV) {
-        baseUrl = `http://localhost:${process.env.PORT || '4000'}`;
-      } else {
-        baseUrl = 'https://exploremytrip.onrender.com';
-      }
-    }
+    const baseUrl = process.env.BACKEND_URL || 'https://e-mytrip.onrender.com';
     const normalized = filePath.replace(/\\/g, '/').replace(/^public\//, '');
     return { url: `${baseUrl}/${normalized}`, public_id: null };
   }

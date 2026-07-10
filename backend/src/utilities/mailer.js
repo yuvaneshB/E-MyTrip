@@ -124,7 +124,7 @@ export const sendEmail = async ({ to, subject, html, attachments = [], emailType
 
 export const generateOtpEmailHtml = ({ userName, otp, purpose, expiryMinutes }) => {
   const greeting = userName ? `Hello ${userName},` : 'Hello,';
-  
+
   let purposeMessage = '';
   if (purpose === 'verify') {
     purposeMessage = 'Use the verification code below to verify your email address and continue with ExploreMyTrip.';
@@ -170,8 +170,8 @@ export const generateBookingEmailHtml = ({ userName, booking, tour, frontendOrig
   });
 
   const targetOrigin = process.env.NODE_ENV === 'production'
-    ? 'https://explore-my-trip-git-main-yuvaneshbs-projects.vercel.app'
-    : (frontendOrigin || 'http://localhost:5173');
+    ? 'https://e-my-trip.vercel.app'
+    : (frontendOrigin || 'https://e-my-trip.vercel.app');
 
   return `
     <div style="margin-top: 10px; margin-bottom: 10px; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">

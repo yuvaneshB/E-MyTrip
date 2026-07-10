@@ -42,11 +42,7 @@ export const getImagesForLocation = (name, city, country, category = '') => {
  * Removes any external unsplash images, preserving only local uploads.
  */
 const getBackendUrl = () => {
-  if (process.env.BACKEND_URL) return process.env.BACKEND_URL;
-  if (process.env.NODE_ENV === 'development' || !process.env.NODE_ENV) {
-    return `http://localhost:${process.env.PORT || '4000'}`;
-  }
-  return 'https://exploremytrip.onrender.com';
+  return process.env.BACKEND_URL || 'https://e-mytrip.onrender.com';
 };
 
 export const assignUniqueImages = (cards = []) => {
