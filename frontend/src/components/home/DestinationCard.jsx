@@ -8,7 +8,7 @@ const DestinationCard = ({ dest }) => {
   return (
     <Link 
       to={`/tours?search=${encodeURIComponent(dest.name)}`}
-      className="bg-white border border-slate-200/80 rounded-[2rem] overflow-hidden shadow-sm hover:shadow-[0_22px_45px_rgba(0,0,0,0.08)] flex flex-col hover:-translate-y-1.5 transition-all duration-350 group relative w-full aspect-[3/4] select-none cursor-pointer block"
+      className="bg-white border border-slate-200/80 rounded-[2rem] overflow-hidden shadow-sm hover:shadow-[0_20px_35px_rgba(0,0,0,0.06)] flex flex-col hover:-translate-y-1 hover:scale-[1.02] transition-all duration-300 group relative w-full aspect-[3/4] select-none cursor-pointer block"
     >
       
       {/* Background/Image wrapper */}

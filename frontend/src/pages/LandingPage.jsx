@@ -9,7 +9,7 @@ import WhyChooseUs from '../components/home/WhyChooseUs.jsx';
 import SpecialOffers from '../components/home/SpecialOffers.jsx';
 import CustomerReviews from '../components/home/CustomerReviews.jsx';
 import PopularDestinationsGrid from '../components/home/PopularDestinationsGrid.jsx';
-import HomeNewsletter from '../components/home/HomeNewsletter.jsx';
+import HomeFooter from '../components/home/HomeFooter.jsx';
 
 const LandingPage = () => {
   const [categories, setCategories] = useState([]);
@@ -60,7 +60,7 @@ const LandingPage = () => {
       <CustomerReviews />
 
       {/* Newsletter Signup Banner */}
-      <HomeNewsletter />
+      <HomeFooter />
     </div>
   );
 };

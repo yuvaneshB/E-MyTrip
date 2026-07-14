@@ -2,10 +2,12 @@ import React, { useState, useEffect } from 'react';
 import api from '../../services/api.js';
 import DestinationCard from './DestinationCard.jsx';
 import TrendingSkeleton from './TrendingSkeleton.jsx';
+import { motion, useReducedMotion } from 'framer-motion';
 
 const TopTrendingDestinations = () => {
   const [destinations, setDestinations] = useState([]);
   const [loading, setLoading] = useState(true);
+  const shouldReduceMotion = useReducedMotion();
 
   useEffect(() => {
     const fetchTrending = async () => {
@@ -23,10 +25,39 @@ const TopTrendingDestinations = () => {
     fetchTrending();
   }, []);
 
+  const headerVariants = shouldReduceMotion
+    ? { hidden: { opacity: 1 }, show: { opacity: 1 } }
+    : {
+        hidden: { opacity: 0, y: 20 },
+        show: { opacity: 1, y: 0, transition: { duration: 0.6, ease: 'easeOut' } }
+      };
+
+  const containerVariants = {
+    hidden: {},
+    show: {
+      transition: {
+        staggerChildren: 0.1
+      }
+    }
+  };
+
+  const cardVariants = shouldReduceMotion
+    ? { hidden: { opacity: 1 }, show: { opacity: 1 } }
+    : {
+        hidden: { opacity: 0, y: 30 },
+        show: { opacity: 1, y: 0, transition: { duration: 0.6, ease: 'easeOut' } }
+      };
+
   return (
     <section className="max-w-7xl mx-auto px-6 py-16 font-sans">
       {/* Title Header */}
-      <div className="flex flex-col items-center text-center space-y-3 mb-12">
+      <motion.div 
+        variants={headerVariants}
+        initial="hidden"
+        whileInView="show"
+        viewport={{ once: true, margin: '-60px' }}
+        className="flex flex-col items-center text-center space-y-3 mb-12"
+      >
         <span className="text-[10px] bg-gold-500/10 text-gold-600 px-3 py-1 rounded-full font-bold uppercase tracking-wider">
           Incredible India
         </span>
@@ -36,7 +67,7 @@ const TopTrendingDestinations = () => {
         <p className="text-slate-500 text-xs max-w-lg leading-relaxed">
           Explore India's most breathtaking and popular tourist spots — from snow-capped Himalayas to sun-kissed beaches.
         </p>
-      </div>
+      </motion.div>
 
       {/* Grid / Slider Container */}
       {loading ? (
@@ -46,11 +77,19 @@ const TopTrendingDestinations = () => {
           No trending destinations found.
         </div>
       ) : (
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-5">
+        <motion.div 
+          variants={containerVariants}
+          initial="hidden"
+          whileInView="show"
+          viewport={{ once: true, margin: '-60px' }}
+          className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-5"
+        >
           {destinations.map((dest) => (
-            <DestinationCard key={dest.name} dest={dest} />
+            <motion.div key={dest.name} variants={cardVariants}>
+              <DestinationCard dest={dest} />
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
       )}
     </section>
   );

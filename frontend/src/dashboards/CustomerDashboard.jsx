@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext.jsx';
 import api, { getBackendUrl } from '../services/api.js';
 import Sidebar from '../components/Sidebar.jsx';
+import SupportTicketsCustomer from '../components/SupportTicketsCustomer.jsx';
 import { 
   Shield, Award, User, FileText 
 } from 'lucide-react';
@@ -13,7 +14,7 @@ const CustomerDashboard = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const [activeTab, setActiveTab] = useState('bookings'); // 'bookings', 'profile', 'refunds'
+  const [activeTab, setActiveTab] = useState('bookings'); // 'bookings', 'profile', 'refunds', 'tickets'
 
   useEffect(() => {
     const path = location.pathname;
@@ -21,6 +22,8 @@ const CustomerDashboard = () => {
       setActiveTab('profile');
     } else if (path.endsWith('/refunds')) {
       setActiveTab('refunds');
+    } else if (path.endsWith('/tickets') || path.includes('/tickets/')) {
+      setActiveTab('tickets');
     } else {
       setActiveTab('bookings');
     }
@@ -164,6 +167,12 @@ const CustomerDashboard = () => {
             className={`pb-2 text-xs font-bold uppercase tracking-wider border-b-2 transition-all ${activeTab === 'refunds' ? 'border-gold-500 text-gold-500' : 'border-transparent text-slate-500 hover:text-slate-800'}`}
           >
             Refund Tracker
+          </button>
+          <button 
+            onClick={() => handleTabChange('tickets')}
+            className={`pb-2 text-xs font-bold uppercase tracking-wider border-b-2 transition-all ${activeTab === 'tickets' ? 'border-gold-500 text-gold-500' : 'border-transparent text-slate-500 hover:text-slate-800'}`}
+          >
+            Support Tickets
           </button>
         </div>
 
@@ -483,6 +492,10 @@ const CustomerDashboard = () => {
               )}
             </div>
           </div>
+        )}
+
+        {activeTab === 'tickets' && (
+          <SupportTicketsCustomer />
         )}
       </div>
 

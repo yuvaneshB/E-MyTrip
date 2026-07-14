@@ -2,8 +2,10 @@ import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
+import { ArrowLeft } from 'lucide-react';
 import toast from 'react-hot-toast';
 import logo from '../assets/logo.png';
+
 
 const VerifyOTPPage = () => {
   const { verifyOTP } = useAuth();
@@ -31,6 +33,17 @@ const VerifyOTPPage = () => {
 
   return (
     <div className="h-full w-full flex items-center justify-center bg-gradient-to-br from-slate-50 via-white to-blue-50 px-4 relative overflow-hidden">
+      {/* Back to Login Button */}
+      <button
+        onClick={() => navigate('/login')}
+        aria-label="Back to Login"
+        type="button"
+        className="absolute top-6 left-6 md:top-8 md:left-8 z-20 flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold text-slate-650 hover:text-gold-600 bg-transparent hover:bg-slate-100/60 active:bg-slate-150 border border-transparent focus:outline-none focus:ring-2 focus:ring-gold-500/20 group transition-all duration-300 cursor-pointer"
+      >
+        <ArrowLeft className="w-4 h-4 transition-transform duration-300 group-hover:-translate-x-1" />
+        <span>Back to Login</span>
+      </button>
+
       <div className="w-full max-w-md bg-white border border-slate-200 p-8 rounded-3xl shadow-xl relative z-10 text-center">
         <div className="flex flex-col items-center gap-4 mb-8">
           <img src={logo} alt="ExploreMyTrip Logo" className="h-12 object-contain" />

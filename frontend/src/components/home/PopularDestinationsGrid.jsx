@@ -1,6 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
+import { motion, useReducedMotion } from 'framer-motion';
 import PremiumTravelImage from '../tours/PremiumTravelImage.jsx';
 
 const destinations = [
@@ -48,16 +49,17 @@ const destinations = [
   }
 ];
 
-const DestCard = ({ d, onClick }) => (
-  <div
+const DestCard = ({ d, onClick, cardVariants }) => (
+  <motion.div
+    variants={cardVariants}
     onClick={() => onClick(d.name)}
-    className={`${d.cols} ${d.height} relative rounded-[1.75rem] overflow-hidden group cursor-pointer shadow-md hover:shadow-2xl hover:-translate-y-1 transition-all duration-300`}
+    className={`${d.cols} ${d.height} relative rounded-[1.75rem] overflow-hidden group cursor-pointer shadow-md hover:shadow-[0_20px_35px_rgba(0,0,0,0.06)] hover:-translate-y-1 hover:scale-[1.02] transition-all duration-300`}
   >
     {/* Image */}
     <PremiumTravelImage
       src={d.image}
       alt={d.name}
-      className="group-hover:scale-105"
+      className="group-hover:scale-[1.02] transition-transform duration-300"
       category="sightseeing"
     />
     {/* Gradient overlay */}
@@ -83,20 +85,50 @@ const DestCard = ({ d, onClick }) => (
 
     {/* Hover border highlight */}
     <div className="absolute inset-0 rounded-[1.75rem] border-2 border-transparent group-hover:border-white/15 pointer-events-none transition-all duration-300" />
-  </div>
+  </motion.div>
 );
 
 const PopularDestinationsGrid = () => {
   const navigate = useNavigate();
+  const shouldReduceMotion = useReducedMotion();
   const handleDestClick = (term) => navigate(`/tours?search=${encodeURIComponent(term)}`);
 
   const row1 = destinations.slice(0, 3); // Paris(2col) + Dubai(1col) + Tokyo(1col) = 4cols
   const row2 = destinations.slice(3, 5); // Maldives(1col) + Switzerland(3cols) = 4cols
 
+  const headerVariants = shouldReduceMotion
+    ? { hidden: { opacity: 1 }, show: { opacity: 1 } }
+    : {
+        hidden: { opacity: 0, y: 20 },
+        show: { opacity: 1, y: 0, transition: { duration: 0.6, ease: 'easeOut' } }
+      };
+
+  const containerVariants = {
+    hidden: {},
+    show: {
+      transition: {
+        staggerChildren: 0.1
+      }
+    }
+  };
+
+  const cardVariants = shouldReduceMotion
+    ? { hidden: { opacity: 1 }, show: { opacity: 1 } }
+    : {
+        hidden: { opacity: 0, y: 25 },
+        show: { opacity: 1, y: 0, transition: { duration: 0.6, ease: 'easeOut' } }
+      };
+
   return (
     <section className="max-w-7xl mx-auto px-6 py-16 font-sans">
       {/* Section Header */}
-      <div className="flex flex-col items-center text-center space-y-3 mb-12">
+      <motion.div 
+        variants={headerVariants}
+        initial="hidden"
+        whileInView="show"
+        viewport={{ once: true, margin: '-60px' }}
+        className="flex flex-col items-center text-center space-y-3 mb-12"
+      >
         <span className="text-[10px] bg-gold-500/10 text-gold-600 px-3 py-1 rounded-full font-bold uppercase tracking-wider">
           Top Localities
         </span>
@@ -109,23 +141,35 @@ const PopularDestinationsGrid = () => {
         <p className="text-slate-500 text-xs max-w-md leading-relaxed">
           Discover handpicked destinations with direct departures and complete local hospitality guides.
         </p>
-      </div>
+      </motion.div>
 
       {/* Mosaic Grid — 2 rows, each a 4-column grid */}
       <div className="flex flex-col gap-5">
         {/* Row 1: Paris spans 2 cols, Dubai & Tokyo each 1 col */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-5 items-stretch">
+        <motion.div 
+          variants={containerVariants}
+          initial="hidden"
+          whileInView="show"
+          viewport={{ once: true, margin: '-60px' }}
+          className="grid grid-cols-1 md:grid-cols-4 gap-5 items-stretch"
+        >
           {row1.map((d, i) => (
-            <DestCard key={i} d={d} onClick={handleDestClick} />
+            <DestCard key={i} d={d} onClick={handleDestClick} cardVariants={cardVariants} />
           ))}
-        </div>
+        </motion.div>
 
         {/* Row 2: Maldives 1 col, Switzerland spans 3 cols */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-5 items-stretch">
+        <motion.div 
+          variants={containerVariants}
+          initial="hidden"
+          whileInView="show"
+          viewport={{ once: true, margin: '-60px' }}
+          className="grid grid-cols-1 md:grid-cols-4 gap-5 items-stretch"
+        >
           {row2.map((d, i) => (
-            <DestCard key={i} d={d} onClick={handleDestClick} />
+            <DestCard key={i} d={d} onClick={handleDestClick} cardVariants={cardVariants} />
           ))}
-        </div>
+        </motion.div>
       </div>
     </section>
   );

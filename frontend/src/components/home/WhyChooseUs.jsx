@@ -1,7 +1,10 @@
 import React from 'react';
 import { DollarSign, ShieldCheck, CreditCard, Headphones, Bolt, MapPin } from 'lucide-react';
+import { motion, useReducedMotion } from 'framer-motion';
 
 const WhyChooseUs = () => {
+  const shouldReduceMotion = useReducedMotion();
+  
   const features = [
     {
       icon: <DollarSign className="w-6 h-6 text-gold-500" />,
@@ -35,10 +38,39 @@ const WhyChooseUs = () => {
     }
   ];
 
+  const headerVariants = shouldReduceMotion
+    ? { hidden: { opacity: 1 }, show: { opacity: 1 } }
+    : {
+        hidden: { opacity: 0, y: 20 },
+        show: { opacity: 1, y: 0, transition: { duration: 0.6, ease: 'easeOut' } }
+      };
+
+  const containerVariants = {
+    hidden: {},
+    show: {
+      transition: {
+        staggerChildren: 0.08
+      }
+    }
+  };
+
+  const itemVariants = shouldReduceMotion
+    ? { hidden: { opacity: 1 }, show: { opacity: 1 } }
+    : {
+        hidden: { opacity: 0, y: 25 },
+        show: { opacity: 1, y: 0, transition: { duration: 0.5, ease: 'easeOut' } }
+      };
+
   return (
     <section className="bg-slate-50 border-y border-slate-200/60 py-20 px-6 font-sans">
       <div className="max-w-7xl mx-auto space-y-16">
-        <div className="flex flex-col items-center text-center space-y-3">
+        <motion.div 
+          variants={headerVariants}
+          initial="hidden"
+          whileInView="show"
+          viewport={{ once: true, margin: '-60px' }}
+          className="flex flex-col items-center text-center space-y-3"
+        >
           <span className="text-[10px] bg-gold-500/10 text-gold-600 px-3 py-1 rounded-full font-bold uppercase tracking-wider">
             Our Standards
           </span>
@@ -48,15 +80,22 @@ const WhyChooseUs = () => {
           <p className="text-slate-500 text-xs max-w-md leading-relaxed">
             We deliver true luxury management, secure inventory seat reservations, and premium itinerary details.
           </p>
-        </div>
+        </motion.div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <motion.div 
+          variants={containerVariants}
+          initial="hidden"
+          whileInView="show"
+          viewport={{ once: true, margin: '-60px' }}
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+        >
           {features.map((f, i) => (
-            <div 
+            <motion.div 
               key={i} 
-              className="bg-white border border-slate-200/80 p-7 rounded-3xl flex items-start gap-5 hover:shadow-[0_12px_24px_rgba(0,0,0,0.04)] hover:-translate-y-0.5 transition-all duration-300 group"
+              variants={itemVariants}
+              className="bg-white border border-slate-200/80 p-7 rounded-3xl flex items-start gap-5 hover:shadow-[0_12px_24px_rgba(0,0,0,0.04)] hover:-translate-y-1 hover:scale-[1.02] transition-all duration-300 group"
             >
-              <div className="w-12 h-12 rounded-2xl bg-gold-500/5 flex items-center justify-center shrink-0 group-hover:scale-105 group-hover:bg-gold-500/10 transition-all duration-350 shadow-inner">
+              <div className="w-12 h-12 rounded-2xl bg-gold-500/5 flex items-center justify-center shrink-0 group-hover:scale-105 group-hover:bg-gold-500/10 transition-all duration-300 shadow-inner">
                 {f.icon}
               </div>
               <div className="text-left space-y-1.5">
@@ -67,9 +106,9 @@ const WhyChooseUs = () => {
                   {f.desc}
                 </p>
               </div>
-            </div>
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
       </div>
     </section>
   );

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import SearchBar from './SearchBar.jsx';
 import { Compass } from 'lucide-react';
+import { motion, useReducedMotion } from 'framer-motion';
 
 const HERO_IMAGES = [
   'https://images.unsplash.com/photo-1502602898657-3e91760cbb34?auto=format&fit=crop&w=2000&q=80', // Paris
@@ -17,6 +18,7 @@ const DESTINATIONS = ['Paris', 'Dubai', 'Switzerland', 'Tokyo', 'Bali', 'Maldive
 
 const HeroSection = ({ categories }) => {
   const [currentIdx, setCurrentIdx] = useState(0);
+  const shouldReduceMotion = useReducedMotion();
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -24,6 +26,14 @@ const HeroSection = ({ categories }) => {
     }, 6000);
     return () => clearInterval(timer);
   }, []);
+
+  const textVariants = shouldReduceMotion 
+    ? { hidden: { opacity: 1 }, show: { opacity: 1 } }
+    : { hidden: { opacity: 0, y: 25 }, show: { opacity: 1, y: 0, transition: { duration: 0.8, ease: "easeOut" } } };
+
+  const searchVariants = shouldReduceMotion
+    ? { hidden: { opacity: 1 }, show: { opacity: 1 } }
+    : { hidden: { opacity: 0, y: 20, scale: 0.98 }, show: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.8, delay: 0.15, ease: "easeOut" } } };
 
   return (
     <div className="relative h-[680px] md:h-[750px] flex items-center justify-center text-center px-4 overflow-hidden bg-slate-950">
@@ -43,23 +53,37 @@ const HeroSection = ({ categories }) => {
 
       {/* Content wrapper */}
       <div className="relative max-w-4xl mx-auto z-10 space-y-8 flex flex-col items-center transform -translate-y-16 md:-translate-y-20">
+        
+        {/* Animated Heading & Subtitle wrapper */}
+        <motion.div
+          variants={textVariants}
+          initial="hidden"
+          animate="show"
+          className="space-y-6 flex flex-col items-center w-full"
+        >
+          {/* Heading */}
+          <h1 className="text-4xl md:text-7xl font-extrabold tracking-tight text-white leading-[1.15] drop-shadow-xl select-none">
+            Discover Exquisite <br />
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-slate-200 via-blue-400 to-blue-600 font-black">
+              {DESTINATIONS[currentIdx]} Getaways
+            </span>
+          </h1>
 
+          {/* Subtitle */}
+          <p className="text-white/80 md:text-lg max-w-2xl mx-auto font-medium leading-relaxed">
+            Discover unforgettable destinations, book amazing tours and create memories that last a lifetime.
+          </p>
+        </motion.div>
 
-        {/* Heading */}
-        <h1 className="text-4xl md:text-7xl font-extrabold tracking-tight text-white leading-[1.15] drop-shadow-xl select-none">
-          Discover Exquisite <br />
-          <span className="text-transparent bg-clip-text bg-gradient-to-r from-slate-200 via-blue-400 to-blue-600 font-black">
-            {DESTINATIONS[currentIdx]} Getaways
-          </span>
-        </h1>
-
-        {/* Subtitle */}
-        <p className="text-white/80 md:text-lg max-w-2xl mx-auto font-medium leading-relaxed">
-          Discover unforgettable destinations, book amazing tours and create memories that last a lifetime.
-        </p>
-
-        {/* Global Search Bar */}
-        <SearchBar categories={categories} />
+        {/* Global Search Bar Wrapper */}
+        <motion.div
+          variants={searchVariants}
+          initial="hidden"
+          animate="show"
+          className="w-full"
+        >
+          <SearchBar categories={categories} />
+        </motion.div>
       </div>
 
       {/* Bottom curved transition */}

@@ -27,6 +27,9 @@ import discoverRoutes from './routes/discoverRoutes.js';
 import destinationRoutes from './routes/destinationRoutes.js';
 import agentTourRoutes from './routes/agentTourRoutes.js';
 import chatbotRoutes from './routes/chatbotRoutes.js';
+import staffRoutes from './routes/staffRoutes.js';
+import ticketRoutes from './routes/ticketRoutes.js';
+
 // Validate Gemini configuration at startup
 if (process.env.GEMINI_API_KEY) {
   console.log('Gemini API configuration loaded');
@@ -95,6 +98,9 @@ app.use('/api/discover', discoverRoutes);
 app.use('/api/v1/destinations', destinationRoutes);
 app.use('/api/v1/agent-tours', agentTourRoutes);
 app.use('/api/v1/chatbot', chatbotRoutes);
+app.use('/api/v1/staff', staffRoutes);
+app.use('/api/v1/tickets', ticketRoutes);
+
 
 
 
@@ -144,6 +150,14 @@ connectDB().then(async () => {
     }
   } catch (seedErr) {
     console.error('Auto-seed check failed:', seedErr.message);
+  }
+
+  // Bootstrap Admin account
+  try {
+    const { bootstrapAdmin } = await import('./utilities/bootstrapAdmin.js');
+    await bootstrapAdmin();
+  } catch (bootstrapErr) {
+    console.error('Bootstrap admin check failed:', bootstrapErr.message);
   }
 
   server.listen(PORT, () => {

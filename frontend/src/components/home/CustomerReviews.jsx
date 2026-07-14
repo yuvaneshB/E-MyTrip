@@ -1,7 +1,10 @@
 import React from 'react';
 import { Star } from 'lucide-react';
+import { motion, useReducedMotion } from 'framer-motion';
 
 const CustomerReviews = () => {
+  const shouldReduceMotion = useReducedMotion();
+
   const reviews = [
     {
       name: "Sophia Carter",
@@ -26,9 +29,58 @@ const CustomerReviews = () => {
     }
   ];
 
+  const headerVariants = shouldReduceMotion
+    ? { hidden: { opacity: 1 }, show: { opacity: 1 } }
+    : {
+        hidden: { opacity: 0, y: 20 },
+        show: { opacity: 1, y: 0, transition: { duration: 0.6, ease: 'easeOut' } }
+      };
+
+  const containerVariants = {
+    hidden: {},
+    show: {
+      transition: {
+        staggerChildren: 0.1
+      }
+    }
+  };
+
+  const getCardVariants = (index) => {
+    if (shouldReduceMotion) {
+      return { hidden: { opacity: 1 }, show: { opacity: 1 } };
+    }
+
+    let initialX = 0;
+    let initialY = 0;
+
+    if (index === 0) {
+      initialX = -25;
+    } else if (index === 1) {
+      initialY = 25;
+    } else if (index === 2) {
+      initialX = 25;
+    }
+
+    return {
+      hidden: { opacity: 0, x: initialX, y: initialY },
+      show: { 
+        opacity: 1, 
+        x: 0, 
+        y: 0, 
+        transition: { duration: 0.7, ease: 'easeOut' } 
+      }
+    };
+  };
+
   return (
     <section className="max-w-7xl mx-auto px-6 py-16 font-sans">
-      <div className="flex flex-col items-center text-center space-y-3 mb-12">
+      <motion.div 
+        variants={headerVariants}
+        initial="hidden"
+        whileInView="show"
+        viewport={{ once: true, margin: '-60px' }}
+        className="flex flex-col items-center text-center space-y-3 mb-12"
+      >
         <span className="text-[10px] bg-gold-500/10 text-gold-600 px-3 py-1 rounded-full font-bold uppercase tracking-wider">
           Client Feedback
         </span>
@@ -38,13 +90,20 @@ const CustomerReviews = () => {
         <p className="text-slate-500 text-xs max-w-md leading-relaxed">
           Read genuine reviews from verified customers who explored global getaways with our platform.
         </p>
-      </div>
+      </motion.div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      <motion.div 
+        variants={containerVariants}
+        initial="hidden"
+        whileInView="show"
+        viewport={{ once: true, margin: '-60px' }}
+        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+      >
         {reviews.map((r, i) => (
-          <div 
+          <motion.div 
             key={i} 
-            className="bg-white border border-slate-200/80 p-6 md:p-8 rounded-[2rem] flex flex-col justify-between hover:shadow-[0_15px_30px_rgba(0,0,0,0.03)] hover:-translate-y-0.5 transition-all duration-300 relative text-left"
+            variants={getCardVariants(i)}
+            className="bg-white border border-slate-200/80 p-6 md:p-8 rounded-[2rem] flex flex-col justify-between hover:shadow-[0_15px_30px_rgba(0,0,0,0.03)] hover:-translate-y-1 hover:scale-[1.02] transition-all duration-300 relative text-left"
           >
             {/* Stars */}
             <div className="flex gap-1 mb-5">
@@ -71,9 +130,9 @@ const CustomerReviews = () => {
                 <span className="text-[10px] text-slate-400 font-bold block mt-0.5 uppercase tracking-wider">{r.country}</span>
               </div>
             </div>
-          </div>
+          </motion.div>
         ))}
-      </div>
+      </motion.div>
     </section>
   );
 };

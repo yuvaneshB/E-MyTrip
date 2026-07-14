@@ -39,7 +39,7 @@ const generateRefreshToken = (user) => {
 // Register User
 export const register = async (req, res, next) => {
   try {
-    const { name, email, password, role } = req.body;
+    const { name, email, password } = req.body;
 
     const existingUser = await User.findOne({ email });
     if (existingUser) {
@@ -54,7 +54,7 @@ export const register = async (req, res, next) => {
       name,
       email,
       password,
-      role: role || 'Customer',
+      role: 'Customer', // Public register is Customer only. Explicitly enforce and override.
       verificationOTP: otp,
       verificationOTPExpires: otpExpires
     });
@@ -78,8 +78,6 @@ export const register = async (req, res, next) => {
     });
 
     await logActivity(user._id, 'USER_REGISTER', `Created account with role: ${user.role}`, req);
-
-
 
     res.status(201).json({
       success: true,
@@ -115,7 +113,11 @@ export const login = async (req, res, next) => {
     }
 
     if (!user.isActive) {
-      return res.status(403).json({ success: false, message: 'Account is deactivated' });
+      return res.status(403).json({ success: false, message: 'Your account is inactive. Please contact the administrator.' });
+    }
+
+    if (!['Customer', 'Agent', 'Manager', 'Finance'].includes(user.role)) {
+      return res.status(403).json({ success: false, message: 'User role is not supported' });
     }
 
 

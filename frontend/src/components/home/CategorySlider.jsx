@@ -1,5 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { motion, useReducedMotion } from 'framer-motion';
 import { 
   LuxuryTourIcon, AdventureTourIcon, BudgetEscapeIcon, LandmarkIcon, 
   TempleIcon, FamilyPackageIcon, BeachHolidayIcon, WildlifeSafariIcon, 
@@ -51,10 +52,40 @@ const renderCategoryIcon = (name, size = 28, strokeWidth = 2, color = 'currentCo
 
 const CategorySlider = ({ categories }) => {
   const navigate = useNavigate();
+  const shouldReduceMotion = useReducedMotion();
+
+  const headerVariants = shouldReduceMotion
+    ? { hidden: { opacity: 1 }, show: { opacity: 1 } }
+    : {
+        hidden: { opacity: 0, y: 20 },
+        show: { opacity: 1, y: 0, transition: { duration: 0.6, ease: 'easeOut' } }
+      };
+
+  const containerVariants = {
+    hidden: {},
+    show: {
+      transition: {
+        staggerChildren: 0.05
+      }
+    }
+  };
+
+  const itemVariants = shouldReduceMotion
+    ? { hidden: { opacity: 1 }, show: { opacity: 1 } }
+    : {
+        hidden: { opacity: 0, y: 20 },
+        show: { opacity: 1, y: 0, transition: { duration: 0.5, ease: 'easeOut' } }
+      };
 
   return (
     <section className="max-w-7xl mx-auto px-6 py-12">
-      <div className="flex flex-col items-center text-center space-y-3 mb-10">
+      <motion.div 
+        variants={headerVariants}
+        initial="hidden"
+        whileInView="show"
+        viewport={{ once: true, margin: '-60px' }}
+        className="flex flex-col items-center text-center space-y-3 mb-10"
+      >
         <span className="text-[10px] bg-gold-500/10 text-gold-600 px-3 py-1 rounded-full font-bold uppercase tracking-wider">
           Experience Styles
         </span>
@@ -64,15 +95,22 @@ const CategorySlider = ({ categories }) => {
         <p className="text-slate-500 text-xs max-w-md leading-relaxed">
           Find your perfect getaway styled precisely to your vacation interest and comfort plans.
         </p>
-      </div>
+      </motion.div>
 
       {/* Categories Scrollable Container */}
-      <div className="flex items-center gap-4 overflow-x-auto pb-4 scrollbar-thin scrollbar-thumb-slate-200 scrollbar-track-transparent snap-x snap-mandatory">
+      <motion.div 
+        variants={containerVariants}
+        initial="hidden"
+        whileInView="show"
+        viewport={{ once: true, margin: '-60px' }}
+        className="flex items-center gap-4 overflow-x-auto pb-4 scrollbar-thin scrollbar-thumb-slate-200 scrollbar-track-transparent snap-x snap-mandatory"
+      >
         {categories.map((cat) => (
-          <div 
+          <motion.div 
             key={cat._id}
+            variants={itemVariants}
             onClick={() => navigate(`/tours?category=${cat._id}`)}
-            className="flex-shrink-0 w-36 sm:w-44 bg-white border border-slate-100 hover:border-gold-300 hover:shadow-[0_12px_24px_rgba(212,175,55,0.08)] rounded-3xl p-5 cursor-pointer hover:-translate-y-1 transition-all duration-300 group flex flex-col items-center text-center gap-3.5 snap-start relative overflow-hidden"
+            className="flex-shrink-0 w-36 sm:w-44 bg-white border border-slate-100 hover:border-gold-300 hover:shadow-[0_12px_24px_rgba(212,175,55,0.08)] rounded-3xl p-5 cursor-pointer hover:-translate-y-1 hover:scale-[1.02] transition-all duration-300 group flex flex-col items-center text-center gap-3.5 snap-start relative overflow-hidden"
           >
             {/* Background shape */}
             <div className="absolute top-0 right-0 w-12 h-12 bg-slate-50 rounded-full translate-x-3 -translate-y-3 group-hover:scale-[1.8] group-hover:bg-gold-500/5 transition-all duration-300 pointer-events-none" />
@@ -88,9 +126,9 @@ const CategorySlider = ({ categories }) => {
                 {cat.description || 'Explore deals'}
               </p>
             </div>
-          </div>
+          </motion.div>
         ))}
-      </div>
+      </motion.div>
     </section>
   );
 };

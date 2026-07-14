@@ -1,12 +1,44 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Calendar, Star, MapPin, ArrowRight } from 'lucide-react';
+import { motion, useReducedMotion } from 'framer-motion';
 import WishlistButton from '../WishlistButton.jsx';
 
 const FeaturedDestinations = ({ tours, loading }) => {
+  const shouldReduceMotion = useReducedMotion();
+
+  const headerVariants = shouldReduceMotion
+    ? { hidden: { opacity: 1 }, show: { opacity: 1 } }
+    : {
+        hidden: { opacity: 0, y: 20 },
+        show: { opacity: 1, y: 0, transition: { duration: 0.6, ease: 'easeOut' } }
+      };
+
+  const containerVariants = {
+    hidden: {},
+    show: {
+      transition: {
+        staggerChildren: 0.1
+      }
+    }
+  };
+
+  const cardVariants = shouldReduceMotion
+    ? { hidden: { opacity: 1 }, show: { opacity: 1 } }
+    : {
+        hidden: { opacity: 0, y: 30 },
+        show: { opacity: 1, y: 0, transition: { duration: 0.6, ease: 'easeOut' } }
+      };
+
   return (
     <section className="max-w-7xl mx-auto px-6 py-16">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-12 gap-4">
+      <motion.div 
+        variants={headerVariants}
+        initial="hidden"
+        whileInView="show"
+        viewport={{ once: true, margin: '-60px' }}
+        className="flex flex-col md:flex-row justify-between items-start md:items-end mb-12 gap-4"
+      >
         <div className="space-y-2 text-left">
           <span className="text-[10px] bg-gold-500/10 text-gold-600 px-3 py-1 rounded-full font-bold uppercase tracking-wider">
             Trending Holidays
@@ -22,7 +54,7 @@ const FeaturedDestinations = ({ tours, loading }) => {
         >
           View All Tours <ArrowRight className="w-4 h-4" />
         </Link>
-      </div>
+      </motion.div>
 
       {loading ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -35,20 +67,27 @@ const FeaturedDestinations = ({ tours, loading }) => {
           No tours are currently active. Please log in as Manager to publish new tours.
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <motion.div 
+          variants={containerVariants}
+          initial="hidden"
+          whileInView="show"
+          viewport={{ once: true, margin: '-60px' }}
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+        >
           {tours.map((tour) => {
             const basePrice = tour.pricingPlans?.[0]?.price || 0;
             return (
-              <div 
+              <motion.div 
                 key={tour._id}
-                className="bg-white border border-slate-200/80 rounded-3xl overflow-hidden shadow-sm hover:shadow-[0_20px_40px_rgba(0,0,0,0.06)] flex flex-col hover:-translate-y-1.5 transition-all duration-350 group relative"
+                variants={cardVariants}
+                className="bg-white border border-slate-200/80 rounded-3xl overflow-hidden shadow-sm hover:shadow-[0_20px_40px_rgba(0,0,0,0.06)] flex flex-col hover:-translate-y-1 hover:scale-[1.02] transition-all duration-300 group relative"
               >
                 {/* Image Section */}
                 <div className="relative h-64 overflow-hidden shrink-0">
                   <img 
                     src={tour.images?.[0] || 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'} 
                     alt={tour.title} 
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-500"
                   />
                   {/* Glass Card Category Badge */}
                   <div className="absolute top-4 left-4 bg-white/85 backdrop-blur-md px-3 py-1 rounded-full text-slate-800 text-[10px] font-bold border border-slate-200/50 shadow-sm uppercase tracking-wide">
@@ -97,23 +136,23 @@ const FeaturedDestinations = ({ tours, loading }) => {
                     <div className="flex gap-2 shrink-0">
                       <Link 
                         to={`/tours/${tour.slug}`}
-                        className="bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-700 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all shadow-sm"
+                        className="bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-700 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all shadow-sm active:scale-[0.97]"
                       >
                         Details
                       </Link>
                       <Link 
                         to={`/tours/${tour.slug}`}
-                        className="bg-gradient-to-r from-gold-500 to-gold-600 hover:from-gold-600 hover:to-gold-700 text-white px-4 py-2.5 rounded-xl text-xs font-bold transition-all shadow-md shadow-gold-500/10 hover:shadow-gold-500/20"
+                        className="bg-gradient-to-r from-gold-500 to-gold-600 hover:from-gold-600 hover:to-gold-700 text-white px-4 py-2.5 rounded-xl text-xs font-bold transition-all shadow-md shadow-gold-500/10 hover:shadow-gold-500/20 active:scale-[0.97]"
                       >
                         Book Now
                       </Link>
                     </div>
                   </div>
                 </div>
-              </div>
+              </motion.div>
             );
           })}
-        </div>
+        </motion.div>
       )}
     </section>
   );

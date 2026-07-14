@@ -25,7 +25,7 @@ const RegisterPage = () => {
   const onSubmit = async (data) => {
     setLoading(true);
     try {
-      const res = await registerUser(data.name, data.email, data.password, data.role);
+      const res = await registerUser(data.name, data.email, data.password, 'Customer');
       if (res.success) {
         toast.success(res.message);
         navigate('/verify-otp', { state: { email: data.email } });
@@ -126,27 +126,6 @@ const RegisterPage = () => {
             {errors.password && <p className="text-xs text-rose-500 mt-1">{errors.password.message}</p>}
           </div>
 
-          {/* Role Picker (For Demonstration / Multi-role testing) */}
-          <div>
-            <label className="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-2">
-              Account Role
-            </label>
-            <div className="relative">
-              <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
-                <Briefcase className="w-5 h-5" />
-              </span>
-              <select
-                className="w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:border-gold-500 focus:outline-none focus:ring-2 focus:ring-gold-500/10 transition-all appearance-none cursor-pointer text-slate-800"
-                {...register('role', { required: 'Please select a role' })}
-              >
-                <option value="Customer">Customer</option>
-                <option value="Agent">Travel Agent</option>
-                <option value="Manager">Agency Manager</option>
-                <option value="Finance">Finance Officer</option>
-              </select>
-            </div>
-            {errors.role && <p className="text-xs text-rose-500 mt-1">{errors.role.message}</p>}
-          </div>
 
           {/* Register Button */}
           <button
