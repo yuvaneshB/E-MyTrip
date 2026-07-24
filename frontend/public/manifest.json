@@ -1,0 +1,27 @@
+{
+  "name": "ExploreTourism Frontend App",
+  "version": "1.0.0",
+  "id": "7b8f52d5-7805-48fe-8575-c9f088ebd88d",
+  "proxyId": "d487c61b-49e6-488a-aa16-5dd02ccc47b8",
+  "collections": [
+    { "alias": "users", "type": "AppDB" },
+    { "alias": "categories", "type": "AppDB" },
+    { "alias": "countries", "type": "AppDB" },
+    { "alias": "cities", "type": "AppDB" },
+    { "alias": "destinations", "type": "AppDB" },
+    { "alias": "tours", "type": "AppDB" },
+    { "alias": "agentTours", "type": "AppDB" },
+    { "alias": "wishlists", "type": "AppDB" },
+    { "alias": "bookings", "type": "AppDB" },
+    { "alias": "payments", "type": "AppDB" },
+    { "alias": "invoices", "type": "AppDB" },
+    { "alias": "reviews", "type": "AppDB" },
+    { "alias": "refunds", "type": "AppDB" },
+    { "alias": "notifications", "type": "AppDB" },
+    { "alias": "activityLogs", "type": "AppDB" },
+    { "alias": "coupons", "type": "AppDB" },
+    { "alias": "newsletterSubscriptions", "type": "AppDB" },
+    { "alias": "tickets", "type": "AppDB" },
+    { "alias": "ticketReplies", "type": "AppDB" }
+  ]
+}

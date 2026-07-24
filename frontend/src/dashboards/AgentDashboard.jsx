@@ -22,6 +22,8 @@ const AgentDashboard = () => {
       setActiveTab('reviews');
     } else if (path.endsWith('/bookings')) {
       setActiveTab('bookings');
+    } else if (path.endsWith('/staff')) {
+      setActiveTab('staff');
     } else {
       setActiveTab('tours');
     }
@@ -43,6 +45,8 @@ const AgentDashboard = () => {
       navigate('/dashboard/agent/reviews');
     } else if (tabName === 'bookings') {
       navigate('/dashboard/agent/bookings');
+    } else if (tabName === 'staff') {
+      navigate('/dashboard/agent/staff');
     }
   };
   const [tours, setTours] = useState([]);
@@ -52,6 +56,27 @@ const AgentDashboard = () => {
   const [bookings, setBookings] = useState([]);
   const [bookingsLoading, setBookingsLoading] = useState(false);
   const [bookingsStats, setBookingsStats] = useState(null);
+
+  // Staff management states
+  const [staffList, setStaffList] = useState([]);
+  const [staffLoading, setStaffLoading] = useState(false);
+  const [staffSearch, setStaffSearch] = useState('');
+  const [roleFilter, setRoleFilter] = useState('');
+
+  // Staff Modals
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [showResetModal, setShowResetModal] = useState(false);
+  const [showDeleteStaffModal, setShowDeleteStaffModal] = useState(false);
+  const [isDeletingStaff, setIsDeletingStaff] = useState(false);
+
+  // Staff Form
+  const [selectedStaff, setSelectedStaff] = useState(null);
+  const [staffName, setStaffName] = useState('');
+  const [staffEmail, setStaffEmail] = useState('');
+  const [staffPassword, setStaffPassword] = useState('');
+  const [staffRole, setStaffRole] = useState('Manager');
+  const [staffStatus, setStaffStatus] = useState('Active');
 
   // Seeder fields for Category & Destination
   const [catName, setCatName] = useState('');
@@ -368,9 +393,155 @@ const AgentDashboard = () => {
     }
   };
 
+  const loadStaff = async () => {
+    setStaffLoading(true);
+    try {
+      const res = await api.get('/staff');
+      if (res.data.success) {
+        setStaffList(res.data.staff);
+      }
+    } catch (err) {
+      toast.error('Failed to load staff list');
+    } finally {
+      setStaffLoading(false);
+    }
+  };
+
+  const handleCreateStaff = async (e) => {
+    e.preventDefault();
+    if (!staffName || !staffEmail || !staffPassword || !staffRole) {
+      toast.error('Please fill in all required fields.');
+      return;
+    }
+    try {
+      const res = await api.post('/staff', {
+        name: staffName,
+        email: staffEmail,
+        password: staffPassword,
+        role: staffRole,
+        status: staffStatus
+      });
+      if (res.data.success) {
+        toast.success('Staff account created successfully!');
+        setShowAddModal(false);
+        resetStaffForm();
+        loadStaff();
+      }
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Failed to create staff account');
+    }
+  };
+
+  const handleUpdateStaff = async (e) => {
+    e.preventDefault();
+    if (!selectedStaff) return;
+    try {
+      const res = await api.patch(`/staff/${selectedStaff._id}`, {
+        name: staffName,
+        email: staffEmail,
+        role: staffRole,
+        status: staffStatus
+      });
+      if (res.data.success) {
+        toast.success('Staff account updated successfully!');
+        setShowEditModal(false);
+        resetStaffForm();
+        loadStaff();
+      }
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Failed to update staff account');
+    }
+  };
+
+  const handleToggleStatus = async (staff) => {
+    const nextStatus = staff.status === 'Active' ? 'Inactive' : 'Active';
+    try {
+      const res = await api.patch(`/staff/${staff._id}/status`, { status: nextStatus });
+      if (res.data.success) {
+        toast.success(`Staff account ${nextStatus === 'Active' ? 'activated' : 'deactivated'} successfully!`);
+        loadStaff();
+      }
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Failed to update staff status');
+    }
+  };
+
+  const handleResetPassword = async (e) => {
+    e.preventDefault();
+    if (!selectedStaff || !staffPassword || staffPassword.length < 6) {
+      toast.error('Password must be at least 6 characters.');
+      return;
+    }
+    try {
+      const res = await api.patch(`/staff/${selectedStaff._id}/reset-password`, { password: staffPassword });
+      if (res.data.success) {
+        toast.success('Staff password reset successfully!');
+        setShowResetModal(false);
+        resetStaffForm();
+      }
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Failed to reset password');
+    }
+  };
+
+  const openDeleteStaffModal = (staff) => {
+    setSelectedStaff(staff);
+    setShowDeleteStaffModal(true);
+  };
+
+  const handleDeleteStaff = async (e) => {
+    e.preventDefault();
+    if (!selectedStaff) return;
+    setIsDeletingStaff(true);
+    try {
+      const res = await api.delete(`/staff/${selectedStaff._id}`);
+      if (res.data.success) {
+        toast.success('Staff account removed successfully!');
+        setShowDeleteStaffModal(false);
+        resetStaffForm();
+        loadStaff();
+      }
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Failed to remove staff account');
+    } finally {
+      setIsDeletingStaff(false);
+    }
+  };
+
+  const resetStaffForm = () => {
+    setSelectedStaff(null);
+    setStaffName('');
+    setStaffEmail('');
+    setStaffPassword('');
+    setStaffRole('Manager');
+    setStaffStatus('Active');
+  };
+
+  const openAddModal = () => {
+    resetStaffForm();
+    setShowAddModal(true);
+  };
+
+  const openEditModal = (staff) => {
+    setSelectedStaff(staff);
+    setStaffName(staff.name || '');
+    setStaffEmail(staff.email || '');
+    setStaffRole(staff.role || 'Manager');
+    setStaffStatus(staff.status || 'Active');
+    setShowEditModal(true);
+  };
+
+  const openResetModal = (staff) => {
+    setSelectedStaff(staff);
+    setStaffPassword('');
+    setShowResetModal(true);
+  };
+
   useEffect(() => {
     if (activeTab === 'bookings') {
       loadAgentBookings();
+    } else if (activeTab === 'staff') {
+      loadStaff();
     } else {
       loadAgentData();
       api.get('/bookings/agent/my-bookings')
@@ -1412,7 +1583,290 @@ const AgentDashboard = () => {
             </div>
           </div>
         )}
+        {/* Staff Management Tab */}
+        {activeTab === 'staff' && (
+          <div className="glass-panel p-6 rounded-3xl border border-slate-200 space-y-6 shadow-sm font-sans">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-slate-200 pb-5">
+              <div>
+                <h3 className="font-extrabold text-slate-800 text-lg">Staff Account Management</h3>
+                <p className="text-slate-500 text-xs mt-1">Manage and provision access credentials for Manager and Financial Officer accounts.</p>
+              </div>
+              <button
+                onClick={openAddModal}
+                className="bg-gold-500 hover:bg-gold-600 text-white px-5 py-2.5 rounded-xl text-xs font-bold transition-all shadow-md hover:shadow-lg shadow-gold-500/20 cursor-pointer border-none flex items-center gap-1.5 animate-chatbot-pulse"
+              >
+                Add Staff Member
+              </button>
+            </div>
+
+            {/* Filters */}
+            <div className="flex flex-col sm:flex-row gap-3">
+              <div className="flex-1 relative">
+                <input
+                  type="text"
+                  placeholder="Search staff by name or email..."
+                  value={staffSearch}
+                  onChange={(e) => setStaffSearch(e.target.value)}
+                  className="w-full pl-3 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 focus:border-gold-500 focus:outline-none"
+                />
+              </div>
+              <select
+                value={roleFilter}
+                onChange={(e) => setRoleFilter(e.target.value)}
+                className="px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-700 focus:border-gold-500 focus:outline-none cursor-pointer"
+              >
+                <option value="">All Roles</option>
+                <option value="Manager">Manager</option>
+                <option value="Finance">Financial Officer</option>
+              </select>
+            </div>
+
+            {/* Staff Table */}
+            {staffLoading ? (
+              <div className="py-20 text-center">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gold-500 mx-auto"></div>
+                <p className="text-xs text-slate-400 mt-3 font-semibold">Loading staff directory...</p>
+              </div>
+            ) : (
+              <div className="overflow-x-auto rounded-2xl border border-slate-200">
+                <table className="w-full border-collapse text-left text-xs text-slate-650">
+                  <thead className="bg-slate-50 border-b border-slate-200 text-slate-500 uppercase tracking-wider font-semibold">
+                    <tr>
+                      <th className="px-5 py-3">Full Name</th>
+                      <th className="px-5 py-3">Email Address</th>
+                      <th className="px-5 py-3">Role</th>
+                      <th className="px-5 py-3">Status</th>
+                      <th className="px-5 py-3 text-right">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100 bg-white">
+                    {staffList
+                      .filter(s => {
+                        const term = staffSearch.toLowerCase();
+                        const matchesSearch = s.name?.toLowerCase().includes(term) || s.email?.toLowerCase().includes(term);
+                        const matchesRole = !roleFilter || s.role === roleFilter;
+                        return matchesSearch && matchesRole;
+                      })
+                      .map((staff) => (
+                        <tr key={staff._id} className="hover:bg-slate-50/50 transition-colors">
+                          <td className="px-5 py-4 font-bold text-slate-800">{staff.name}</td>
+                          <td className="px-5 py-4">{staff.email}</td>
+                          <td className="px-5 py-4">
+                            <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
+                              staff.role === 'Manager' ? 'bg-indigo-50 text-indigo-600' : 'bg-emerald-50 text-emerald-600'
+                            }`}>
+                              {staff.role === 'Finance' ? 'Financial Officer' : staff.role}
+                            </span>
+                          </td>
+                          <td className="px-5 py-4">
+                            <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
+                              staff.status === 'Active' || staff.isActive ? 'bg-teal-50 text-teal-600' : 'bg-rose-50 text-rose-600'
+                            }`}>
+                              {staff.status || (staff.isActive ? 'Active' : 'Inactive')}
+                            </span>
+                          </td>
+                          <td className="px-5 py-4 text-right space-x-2">
+                            <button
+                              onClick={() => openEditModal(staff)}
+                              className="text-slate-600 hover:text-slate-900 font-bold bg-none border-none cursor-pointer text-xs"
+                            >
+                              Edit
+                            </button>
+                            <button
+                              onClick={() => openResetModal(staff)}
+                              className="text-indigo-600 hover:text-indigo-900 font-bold bg-none border-none cursor-pointer text-xs"
+                            >
+                              Reset Pass
+                            </button>
+                            <button
+                              onClick={() => handleToggleStatus(staff)}
+                              className={`font-bold bg-none border-none cursor-pointer text-xs ${
+                                (staff.status === 'Active' || staff.isActive) ? 'text-rose-600 hover:text-rose-900' : 'text-emerald-600 hover:text-emerald-900'
+                              }`}
+                            >
+                              {(staff.status === 'Active' || staff.isActive) ? 'Deactivate' : 'Activate'}
+                            </button>
+                            <button
+                              onClick={() => openDeleteStaffModal(staff)}
+                              className="text-rose-600 hover:text-rose-900 font-bold bg-none border-none cursor-pointer text-xs"
+                            >
+                              Remove
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    {staffList.length === 0 && (
+                      <tr>
+                        <td colSpan="5" className="px-5 py-10 text-center text-slate-400 italic">No staff members onboarded yet.</td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+        )}
       </div>
+
+      {/* Onboard Staff Modal */}
+      {showAddModal && (
+        <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-white border border-slate-200 rounded-3xl p-6 md:p-8 max-w-md w-full space-y-4 shadow-xl font-sans relative">
+            <h3 className="font-extrabold text-slate-800 text-base">Onboard New Staff Member</h3>
+            <form onSubmit={handleCreateStaff} className="space-y-4">
+              <div>
+                <label className="block text-[10px] font-semibold text-slate-500 uppercase mb-2">Full Name</label>
+                <input
+                  type="text"
+                  required
+                  value={staffName}
+                  onChange={(e) => setStaffName(e.target.value)}
+                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 focus:border-gold-500 focus:outline-none"
+                  placeholder="e.g. John Doe"
+                />
+              </div>
+              <div>
+                <label className="block text-[10px] font-semibold text-slate-500 uppercase mb-2">Email Address</label>
+                <input
+                  type="email"
+                  required
+                  value={staffEmail}
+                  onChange={(e) => setStaffEmail(e.target.value)}
+                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 focus:border-gold-500 focus:outline-none"
+                  placeholder="name@organization.com"
+                />
+              </div>
+              <div>
+                <label className="block text-[10px] font-semibold text-slate-500 uppercase mb-2">Temporary Password</label>
+                <input
+                  type="password"
+                  required
+                  value={staffPassword}
+                  onChange={(e) => setStaffPassword(e.target.value)}
+                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 focus:border-gold-500 focus:outline-none"
+                  placeholder="••••••••"
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-[10px] font-semibold text-slate-500 uppercase mb-2">Assigned Role</label>
+                  <select
+                    value={staffRole}
+                    onChange={(e) => setStaffRole(e.target.value)}
+                    className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-700 focus:border-gold-500 focus:outline-none"
+                  >
+                    <option value="Manager">Manager</option>
+                    <option value="Finance">Financial Officer</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-[10px] font-semibold text-slate-500 uppercase mb-2">Account Status</label>
+                  <select
+                    value={staffStatus}
+                    onChange={(e) => setStaffStatus(e.target.value)}
+                    className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-700 focus:border-gold-500 focus:outline-none"
+                  >
+                    <option value="Active">Active</option>
+                    <option value="Inactive">Inactive</option>
+                  </select>
+                </div>
+              </div>
+              <div className="flex gap-3 justify-end pt-4">
+                <button type="button" onClick={() => setShowAddModal(false)} className="bg-slate-100 hover:bg-slate-200 text-slate-700 px-4 py-2 rounded-xl text-xs font-bold transition-colors cursor-pointer border-none">Cancel</button>
+                <button type="submit" className="bg-gold-500 hover:bg-gold-600 text-white px-4 py-2 rounded-xl text-xs font-bold transition-colors cursor-pointer border-none">Onboard Staff</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Staff Modal */}
+      {showEditModal && selectedStaff && (
+        <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-white border border-slate-200 rounded-3xl p-6 md:p-8 max-w-md w-full space-y-4 shadow-xl font-sans">
+            <h3 className="font-extrabold text-slate-800 text-base">Edit Staff Profile</h3>
+            <form onSubmit={handleUpdateStaff} className="space-y-4">
+              <div>
+                <label className="block text-[10px] font-semibold text-slate-500 uppercase mb-2">Full Name</label>
+                <input
+                  type="text"
+                  required
+                  value={staffName}
+                  onChange={(e) => setStaffName(e.target.value)}
+                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 focus:border-gold-500 focus:outline-none"
+                />
+              </div>
+              <div>
+                <label className="block text-[10px] font-semibold text-slate-500 uppercase mb-2">Email Address</label>
+                <input
+                  type="email"
+                  required
+                  value={staffEmail}
+                  onChange={(e) => setStaffEmail(e.target.value)}
+                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 focus:border-gold-500 focus:outline-none"
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-[10px] font-semibold text-slate-500 uppercase mb-2">Assigned Role</label>
+                  <select
+                    value={staffRole}
+                    onChange={(e) => setStaffRole(e.target.value)}
+                    className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-700 focus:border-gold-500 focus:outline-none"
+                  >
+                    <option value="Manager">Manager</option>
+                    <option value="Finance">Financial Officer</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-[10px] font-semibold text-slate-500 uppercase mb-2">Account Status</label>
+                  <select
+                    value={staffStatus}
+                    onChange={(e) => setStaffStatus(e.target.value)}
+                    className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-700 focus:border-gold-500 focus:outline-none"
+                  >
+                    <option value="Active">Active</option>
+                    <option value="Inactive">Inactive</option>
+                  </select>
+                </div>
+              </div>
+              <div className="flex gap-3 justify-end pt-4">
+                <button type="button" onClick={() => setShowEditModal(false)} className="bg-slate-100 hover:bg-slate-200 text-slate-700 px-4 py-2 rounded-xl text-xs font-bold transition-colors cursor-pointer border-none">Cancel</button>
+                <button type="submit" className="bg-gold-500 hover:bg-gold-600 text-white px-4 py-2 rounded-xl text-xs font-bold transition-colors cursor-pointer border-none">Save Changes</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Reset Staff Password Modal */}
+      {showResetModal && selectedStaff && (
+        <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-white border border-slate-200 rounded-3xl p-6 md:p-8 max-w-sm w-full space-y-4 shadow-xl font-sans">
+            <h3 className="font-extrabold text-slate-800 text-base">Reset Staff Password</h3>
+            <p className="text-xs text-slate-500 leading-relaxed">
+              Set a new secure password for <strong>{selectedStaff.name}</strong>.
+            </p>
+            <form onSubmit={handleResetPassword} className="space-y-4">
+              <div>
+                <label className="block text-[10px] font-semibold text-slate-500 uppercase mb-2">New Password</label>
+                <input
+                  type="password"
+                  required
+                  value={staffPassword}
+                  onChange={(e) => setStaffPassword(e.target.value)}
+                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 focus:border-gold-500 focus:outline-none"
+                  placeholder="Min 6 characters"
+                />
+              </div>
+              <div className="flex gap-3 justify-end pt-4">
+                <button type="button" onClick={() => setShowResetModal(false)} className="bg-slate-100 hover:bg-slate-200 text-slate-700 px-4 py-2 rounded-xl text-xs font-bold transition-colors cursor-pointer border-none">Cancel</button>
+                <button type="submit" className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-xl text-xs font-bold transition-colors cursor-pointer border-none">Reset Password</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
 
       {/* Delete Confirmation Modal */}
       {confirmDeleteId && (
@@ -1470,6 +1924,36 @@ const AgentDashboard = () => {
                 className="bg-rose-600 hover:bg-rose-700 text-white px-4 py-2 rounded-xl text-xs font-bold transition-colors shadow-md cursor-pointer disabled:opacity-50"
               >
                 {isDeletingCat ? 'Removing...' : 'Remove'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Staff Confirmation Modal */}
+      {showDeleteStaffModal && selectedStaff && (
+        <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-white border border-slate-200 rounded-3xl p-6 max-w-sm w-full space-y-4 shadow-xl text-center font-sans">
+            <h3 className="font-extrabold text-slate-800 text-base">Remove Staff Account</h3>
+            <p className="text-xs text-slate-500 leading-relaxed">
+              Are you sure you want to remove this staff account? This action cannot be undone.
+            </p>
+            <div className="flex gap-3 justify-center pt-2">
+              <button
+                type="button"
+                onClick={() => setShowDeleteStaffModal(false)}
+                disabled={isDeletingStaff}
+                className="bg-slate-100 hover:bg-slate-200 border border-slate-200 text-slate-700 px-4 py-2 rounded-xl text-xs font-bold transition-colors cursor-pointer disabled:opacity-50"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleDeleteStaff}
+                disabled={isDeletingStaff}
+                className="bg-rose-600 hover:bg-rose-700 text-white px-4 py-2 rounded-xl text-xs font-bold transition-colors shadow-md cursor-pointer disabled:opacity-50"
+              >
+                {isDeletingStaff ? 'Removing...' : 'Remove'}
               </button>
             </div>
           </div>

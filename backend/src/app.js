@@ -9,6 +9,9 @@ import morgan from 'morgan';
 import cron from 'node-cron';
 import path from 'path';
 import fs from 'fs';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 // Database & configs
 import connectDB from './config/db.js';

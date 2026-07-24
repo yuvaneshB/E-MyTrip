@@ -63,7 +63,7 @@ router.post('/upload-image', protect, authorize('Agent', 'Manager'), (req, res, 
     if (!req.file) {
       return res.status(400).json({ success: false, message: 'Please upload a tour cover image.' });
     }
-    const result = await uploadToCloudinary(req.file.path, 'tours');
+    const result = await uploadToCloudinary(req.file.path, 'Tours');
     res.status(200).json({
       success: true,
       message: 'Image uploaded successfully',

@@ -112,7 +112,7 @@ export const login = async (req, res, next) => {
       return res.status(401).json({ success: false, message: 'Invalid credentials' });
     }
 
-    if (!user.isActive) {
+    if (!user.isActive || user.status === 'Inactive') {
       return res.status(403).json({ success: false, message: 'Your account is inactive. Please contact the administrator.' });
     }
 

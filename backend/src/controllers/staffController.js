@@ -13,9 +13,9 @@ export const getStaff = async (req, res, next) => {
 // CREATE a staff member
 export const createStaff = async (req, res, next) => {
   try {
-    const { name, email, password, role, isActive } = req.body;
+    const { name, email, password, role, status } = req.body;
     if (!name || !email || !password || !role) {
-      return res.status(400).json({ success: false, message: 'All fields are required' });
+      return res.status(400).json({ success: false, message: 'All required fields (name, email, password, role) are required.' });
     }
     if (!['Manager', 'Finance'].includes(role)) {
       return res.status(400).json({ success: false, message: 'Invalid staff role' });
@@ -24,14 +24,17 @@ export const createStaff = async (req, res, next) => {
     if (existingUser) {
       return res.status(400).json({ success: false, message: 'Account already exists with this email' });
     }
+    
     const staffUser = await User.create({
       name,
-      email,
+      email: email.toLowerCase().trim(),
       password,
       role,
       isEmailVerified: true, // pre-verified
-      isActive: isActive !== undefined ? isActive : true
+      status: status || 'Active',
+      isActive: status !== undefined ? (status === 'Active') : true
     });
+    
     const responseUser = staffUser.toObject();
     delete responseUser.password;
     res.status(201).json({ success: true, message: 'Staff account created successfully', staff: responseUser });
@@ -44,7 +47,7 @@ export const createStaff = async (req, res, next) => {
 export const updateStaff = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const { name, email, role } = req.body;
+    const { name, email, role, status } = req.body;
     const user = await User.findById(id);
     if (!user) {
       return res.status(404).json({ success: false, message: 'Staff account not found' });
@@ -62,8 +65,14 @@ export const updateStaff = async (req, res, next) => {
       }
       user.email = email.toLowerCase().trim();
     }
+    
     if (name) user.name = name;
     if (role) user.role = role;
+    if (status !== undefined && ['Active', 'Inactive'].includes(status)) {
+      user.status = status;
+      user.isActive = (status === 'Active');
+    }
+    
     await user.save();
     const responseUser = user.toObject();
     delete responseUser.password;
@@ -73,14 +82,12 @@ export const updateStaff = async (req, res, next) => {
   }
 };
 
-// UPDATE status (isActive) of a staff member
+// UPDATE status of a staff member
 export const updateStaffStatus = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const { isActive } = req.body;
-    if (isActive === undefined) {
-      return res.status(400).json({ success: false, message: 'isActive status is required' });
-    }
+    const { status, isActive } = req.body;
+    
     const user = await User.findById(id);
     if (!user) {
       return res.status(404).json({ success: false, message: 'Staff account not found' });
@@ -88,9 +95,15 @@ export const updateStaffStatus = async (req, res, next) => {
     if (!['Manager', 'Finance'].includes(user.role)) {
       return res.status(400).json({ success: false, message: 'Not a staff account' });
     }
-    user.isActive = isActive;
+    
+    const targetActive = status !== undefined ? (status === 'Active') : (isActive !== undefined ? isActive : user.isActive);
+    const targetStatus = status || (targetActive ? 'Active' : 'Inactive');
+    
+    user.isActive = targetActive;
+    user.status = targetStatus;
+    
     await user.save();
-    res.status(200).json({ success: true, message: `Staff account ${isActive ? 'activated' : 'deactivated'} successfully` });
+    res.status(200).json({ success: true, message: `Staff account ${targetStatus === 'Active' ? 'activated' : 'deactivated'} successfully`, staff: user });
   } catch (error) {
     next(error);
   }
@@ -114,6 +127,24 @@ export const resetStaffPassword = async (req, res, next) => {
     user.password = password;
     await user.save();
     res.status(200).json({ success: true, message: 'Staff credentials reset successfully' });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// DELETE a staff member
+export const deleteStaff = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const user = await User.findById(id);
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'Staff account not found' });
+    }
+    if (!['Manager', 'Finance'].includes(user.role)) {
+      return res.status(400).json({ success: false, message: 'Not a staff account' });
+    }
+    await User.findByIdAndDelete(id);
+    res.status(200).json({ success: true, message: 'Staff account removed successfully' });
   } catch (error) {
     next(error);
   }

@@ -7,10 +7,10 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const DEFAULT_FALLBACK_IMAGE = 'https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?auto=format&fit=crop&w=800&q=80';
+const DEFAULT_FALLBACK_IMAGE = '';
 
 const getValidImage = (img, backendUrl) => {
-  if (!img) return DEFAULT_FALLBACK_IMAGE;
+  if (!img) return '';
 
   let cleanImg = img;
   if (img.includes('/uploads/')) {
@@ -29,34 +29,43 @@ const getValidImage = (img, backendUrl) => {
     return `${backendUrl}${relativePath}`;
   }
 
-  // If local file does not exist (e.g., deployed environment), fallback to a beautiful default image
-  return DEFAULT_FALLBACK_IMAGE;
-};
-
-export const getImagesForLocation = (name, city, country, category = '') => {
-  return [];
+  return '';
 };
 
 /**
  * Helper to safely clean and process card images in a list.
- * Removes any external unsplash images, preserving only local uploads.
+ * Preserves only local uploads/Cloudinary uploads, filtering out Unsplash placeholders.
  */
 const getBackendUrl = () => {
-  return process.env.BACKEND_URL || 'https://e-mytrip.onrender.com';
+  return process.env.BACKEND_URL || `http://localhost:${process.env.PORT || '4000'}`;
 };
 
 export const assignUniqueImages = (cards = []) => {
   const backendUrl = getBackendUrl();
+  
+  const extractUrl = (img) => {
+    if (!img) return '';
+    if (typeof img === 'string') return img;
+    if (typeof img === 'object' && img.url) return img.url;
+    return '';
+  };
+
   return cards.map((card) => {
     // Clone card to prevent mutating original objects
     const cloned = JSON.parse(JSON.stringify(card));
 
     if (cloned.images && cloned.images.length > 0) {
       cloned.images = cloned.images
+        .map(extractUrl)
         .filter(img => img && !img.includes('unsplash.com'))
-        .map(img => getValidImage(img, backendUrl));
+        .map(img => getValidImage(img, backendUrl))
+        .filter(Boolean);
     } else {
       cloned.images = [];
+    }
+
+    if (cloned.image) {
+      cloned.image = extractUrl(cloned.image);
     }
 
     if (cloned.image && cloned.image.includes('unsplash.com')) {
@@ -66,7 +75,7 @@ export const assignUniqueImages = (cards = []) => {
     if (cloned.images.length > 0) {
       cloned.image = cloned.images[0];
     } else {
-      cloned.image = getValidImage('', backendUrl);
+      cloned.image = '';
     }
 
     if (cloned.image && !cloned.image.startsWith('http://') && !cloned.image.startsWith('https://') && !cloned.image.startsWith('data:image/')) {
@@ -78,6 +87,5 @@ export const assignUniqueImages = (cards = []) => {
 };
 
 export default {
-  getImagesForLocation,
   assignUniqueImages
 };

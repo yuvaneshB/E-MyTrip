@@ -20,14 +20,14 @@ const storage = multer.diskStorage({
 });
 
 const fileFilter = (req, file, cb) => {
-  const allowedTypes = /jpeg|jpg|png|webp|gif|pdf|mp4/;
+  const allowedTypes = /jpeg|jpg|png|webp/;
   const mimetype = allowedTypes.test(file.mimetype);
   const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
 
   if (mimetype && extname) {
     return cb(null, true);
   }
-  cb(new Error('Invalid file type. Allowed formats: images, pdf, and mp4.'));
+  cb(new Error('Invalid file type. Allowed formats: JPG, JPEG, PNG, and WebP.'));
 };
 
 const upload = multer({
@@ -53,47 +53,52 @@ export const uploadTourImage = multer({
   fileFilter: tourImageFileFilter
 });
 
-// Helper to upload a local file to Cloudinary if keys are present
-export const uploadToCloudinary = async (filePath, folder = 'tours') => {
-  const apiKey = process.env.CLOUDINARY_API_KEY;
-  const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
-
-  console.log(`[CloudinaryUpload] Starting upload. CloudName: ${cloudName}, APIKey: ${apiKey}`);
-
-  if (!apiKey || apiKey.includes('mock_key')) {
-    // If mock, return local file server path
-    const baseUrl = process.env.BACKEND_URL || 'https://e-mytrip.onrender.com';
-    const normalized = filePath.replace(/\\/g, '/').replace(/^public\//, '');
-    return { url: `${baseUrl}/${normalized}`, public_id: null };
-  }
-
+// Helper to upload a local file to Cloudinary with local fallback
+export const uploadToCloudinary = async (filePath, folder = 'Tours') => {
+  console.log('[Cloudinary] Upload Started');
   try {
-    const result = await cloudinary.uploader.upload(filePath, { folder });
-    // Remove local file after successful upload
+    const options = {
+      folder: `ExploreMyTrip/${folder}`,
+      quality: 'auto',
+      fetch_format: 'auto'
+    };
+
+    const result = await cloudinary.uploader.upload(filePath, options);
+    console.log('[Cloudinary] Upload Successful');
+
+    // Delete local temporary file after successful upload
     if (fs.existsSync(filePath)) {
       fs.unlinkSync(filePath);
     }
-    return { url: result.secure_url, public_id: result.public_id };
+
+    return {
+      url: result.secure_url,
+      public_id: result.public_id
+    };
   } catch (error) {
-    console.error('[CloudinaryUpload] Error during upload operation:', error);
-    // Remove local file on failure as well
-    if (fs.existsSync(filePath)) {
-      fs.unlinkSync(filePath);
-    }
-    throw new Error(error.message || 'Cloudinary upload failed');
+    console.warn('[Cloudinary] Upload Failed, falling back to local storage:', error.message || error);
+
+    // Fallback to serving the local file instead of failing
+    const baseUrl = process.env.BACKEND_URL || `http://localhost:${process.env.PORT || '4000'}`;
+    const filename = path.basename(filePath);
+
+    // Do NOT delete the local file since we need to serve it locally
+    return {
+      url: `${baseUrl}/uploads/${filename}`,
+      public_id: null
+    };
   }
 };
 
 // Helper to delete an asset from Cloudinary
 export const deleteFromCloudinary = async (publicId) => {
-  const apiKey = process.env.CLOUDINARY_API_KEY;
-  if (!apiKey || apiKey.includes('mock_key') || !publicId) {
-    return;
-  }
+  if (!publicId) return;
   try {
-    await cloudinary.uploader.destroy(publicId);
+    const result = await cloudinary.uploader.destroy(publicId);
+    console.log('[Cloudinary] Image Deleted');
+    return result;
   } catch (error) {
-    console.warn('Failed to delete from Cloudinary:', error.message);
+    console.error('[Cloudinary] Deletion Failed:', error.message || error);
   }
 };
 

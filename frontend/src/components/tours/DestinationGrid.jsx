@@ -1,35 +1,51 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { MapPin, Star } from 'lucide-react';
+import { MapPin, Star, Compass } from 'lucide-react';
 import WishlistButton from '../WishlistButton.jsx';
-import PremiumTravelImage from './PremiumTravelImage.jsx';
 
 
 export const DestinationGrid = ({ results = [], handleBookNow }) => {
+  const getImageUrlString = (img) => {
+    if (!img) return '';
+    if (typeof img === 'string') return img;
+    if (typeof img === 'object' && img.url) return img.url;
+    return '';
+  };
+
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 animate-fadeIn">
-      {results.map((item) => (
-        <div 
-          key={item.id}
-          className="bg-white border border-slate-200 rounded-3xl overflow-hidden shadow-sm hover:shadow-lg flex flex-col hover:border-slate-350 transition-all duration-300 group relative select-none w-full"
-        >
-          {/* Header Image Gallery */}
-          <div className="relative h-48 overflow-hidden bg-slate-100">
-            <PremiumTravelImage 
-              src={item.image} 
-              alt={item.name} 
-              className="group-hover:scale-105"
-              category={item.category}
-            />
-            <div className="absolute top-4 left-4 bg-white/95 backdrop-blur-md px-3 py-1 rounded-full text-gold-600 text-[9px] font-bold border border-slate-200 shadow-sm uppercase tracking-wide">
-              {item.category || 'Sightseeing'}
+      {results.map((item) => {
+        const rawImg = (item.images && item.images.length > 0) ? item.images[0] : item.image;
+        const imageUrl = getImageUrlString(rawImg);
+        return (
+          <div 
+            key={item.id}
+            className="bg-white border border-slate-200 rounded-3xl overflow-hidden shadow-sm hover:shadow-lg flex flex-col hover:border-slate-350 transition-all duration-300 group relative select-none w-full"
+          >
+            {/* Header Image Gallery */}
+            <div className="relative h-48 overflow-hidden bg-slate-100 flex items-center justify-center">
+              {imageUrl ? (
+                <img 
+                  src={imageUrl} 
+                  alt={item.name} 
+                  className="w-full h-full object-cover transition-all duration-700 ease-in-out group-hover:scale-105"
+                  loading="lazy"
+                />
+              ) : (
+                <div className="absolute inset-0 bg-slate-150 flex flex-col items-center justify-center text-slate-400 select-none">
+                  <Compass className="w-10 h-10 text-slate-300 mb-1" />
+                  <span className="text-[10px] font-bold uppercase tracking-wider">No Image Available</span>
+                </div>
+              )}
+              <div className="absolute top-4 left-4 bg-white/95 backdrop-blur-md px-3 py-1 rounded-full text-gold-600 text-[9px] font-bold border border-slate-200 shadow-sm uppercase tracking-wide">
+                {item.category || 'Sightseeing'}
+              </div>
+              
+              {/* Heart Wishlist Overlay */}
+              <div className="absolute top-3 right-3 z-20">
+                <WishlistButton tour={item} />
+              </div>
             </div>
-            
-            {/* Heart Wishlist Overlay */}
-            <div className="absolute top-3 right-3 z-20">
-              <WishlistButton tour={item} />
-            </div>
-          </div>
 
           {/* Description Body */}
           <div className="p-5 flex-1 flex flex-col gap-3 font-sans">
@@ -79,7 +95,7 @@ export const DestinationGrid = ({ results = [], handleBookNow }) => {
             </div>
           </div>
         </div>
-      ))}
+      ); })}
     </div>
   );
 };

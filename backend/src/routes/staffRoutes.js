@@ -4,7 +4,8 @@ import {
   createStaff,
   updateStaff,
   updateStaffStatus,
-  resetStaffPassword
+  resetStaffPassword,
+  deleteStaff
 } from '../controllers/staffController.js';
 import { protect } from '../middleware/auth.js';
 import { authorize } from '../middleware/rbac.js';
@@ -20,5 +21,6 @@ router.post('/', createStaff);
 router.patch('/:id', updateStaff);
 router.patch('/:id/status', updateStaffStatus);
 router.patch('/:id/reset-password', resetStaffPassword);
+router.delete('/:id', deleteStaff);
 
 export default router;

@@ -24,7 +24,8 @@ const Sidebar = ({ role }) => {
           { name: 'Create New Tour', path: '/dashboard/agent/create-tour', icon: Calendar },
           { name: 'My Tour Bookings', path: '/dashboard/agent/bookings', icon: Briefcase },
           { name: 'Locations Setup', path: '/dashboard/agent/locations', icon: MapPin },
-          { name: 'Review Replies', path: '/dashboard/agent/reviews', icon: MessageSquare }
+          { name: 'Review Replies', path: '/dashboard/agent/reviews', icon: MessageSquare },
+          { name: 'Staff Management', path: '/dashboard/agent/staff', icon: Shield }
         ];
       case 'Manager':
         return [
