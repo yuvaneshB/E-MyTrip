@@ -155,12 +155,12 @@ connectDB().then(async () => {
     console.error('Auto-seed check failed:', seedErr.message);
   }
 
-  // Bootstrap Admin account
+  // Initialize Admin account
   try {
-    const { bootstrapAdmin } = await import('./utilities/bootstrapAdmin.js');
-    await bootstrapAdmin();
-  } catch (bootstrapErr) {
-    console.error('Bootstrap admin check failed:', bootstrapErr.message);
+    const { initializeAdmin } = await import('./utilities/initAdmin.js');
+    await initializeAdmin();
+  } catch (initAdminErr) {
+    console.error('Admin initialization check failed:', initAdminErr.message);
   }
 
   server.listen(PORT, () => {

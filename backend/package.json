@@ -9,7 +9,6 @@
     "dev": "nodemon src/app.js"
   },
   "dependencies": {
-    "@domoapps/toolkit": "^1.0.0",
     "axios": "^1.18.1",
     "bcryptjs": "^2.4.3",
     "cloudinary": "^2.10.0",

@@ -25,7 +25,7 @@ export const FinanceProfile = () => {
           </div>
           <div>
             <strong className="text-lg text-slate-800 block font-bold">{user?.name || 'Finance Manager'}</strong>
-            <span className="text-xs text-slate-450 block font-semibold">{user?.email || 'finance@test.com'}</span>
+            <span className="text-xs text-slate-450 block font-semibold">{user?.email}</span>
           </div>
         </div>
 

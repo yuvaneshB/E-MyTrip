@@ -67,7 +67,7 @@ const SearchBar = ({ categories }) => {
     navigate(`/tours?search=${encodeURIComponent(term)}`);
   };
 
-  const trendingTags = ['Switzerland', 'Tokyo', 'Paris', 'Dubai', 'Maldives'];
+  const trendingTags = ['Switzerland', 'Tokyo', 'Paris', 'Dubai', 'Maldives', 'Bali', 'Santorini', 'Kyoto', 'Iceland'];
 
   return (
     <div className="w-full max-w-4xl mx-auto space-y-4 font-sans text-left z-20">
@@ -228,7 +228,7 @@ const SearchBar = ({ categories }) => {
             key={tag}
             type="button"
             onClick={() => handleTrendingClick(tag)}
-            className="bg-white/10 hover:bg-white/20 border border-white/10 hover:border-white/20 px-3 py-1 rounded-full text-white/90 hover:text-white font-medium transition-all"
+            className="bg-white/10 hover:bg-white/20 border border-white/10 hover:border-white/20 px-3 py-1 rounded-full text-white/90 hover:text-white font-medium transition-all cursor-pointer"
           >
             {tag}
           </button>
