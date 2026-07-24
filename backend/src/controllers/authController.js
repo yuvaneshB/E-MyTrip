@@ -25,7 +25,7 @@ const logActivity = async (userId, action, description, req) => {
 // Generate Access Token
 const generateAccessToken = (user) => {
   return jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET, {
-    expiresIn: process.env.JWT_ACCESS_EXPIRE || '15m'
+    expiresIn: process.env.JWT_ACCESS_EXPIRE || '24h'
   });
 };
 
@@ -207,16 +207,16 @@ export const refreshToken = async (req, res, next) => {
       return res.status(401).json({ success: false, message: 'User not found' });
     }
 
-    // Check if token matches active refresh token, OR matches previous refresh token within 10 seconds grace period
+    // Check if token matches active refresh token, OR matches previous refresh token within 60 seconds grace period
     const isMainToken = user.refreshToken === token;
     const isPreviousToken = user.previousRefreshToken === token;
     const isWithinGracePeriod = isPreviousToken && 
       user.previousRefreshTokenRotatedAt && 
-      (Date.now() - new Date(user.previousRefreshTokenRotatedAt).getTime() < 10000); // 10-second grace period
+      (Date.now() - new Date(user.previousRefreshTokenRotatedAt).getTime() < 60000); // 60-second grace period
 
     if (!isMainToken && !isWithinGracePeriod) {
       if (isPreviousToken) {
-        console.warn(`[RefreshToken] Rejected: old/rotated refresh token used AFTER 10s grace period expiration for user ${user.email}`);
+        console.warn(`[RefreshToken] Rejected: old/rotated refresh token used AFTER 60s grace period expiration for user ${user.email}`);
       } else {
         console.warn(`[RefreshToken] Rejected: token mismatch. Provided token does not match active or rotated previous token for user ${user.email}`);
       }

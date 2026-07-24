@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useForm, useFieldArray } from 'react-hook-form';
 import api, { getBackendUrl } from '../services/api.js';
-import { CreditCard, Timer, Sparkles, Shield, User, FileText, CheckCircle2 } from 'lucide-react';
+import { CreditCard, Timer, Sparkles, Shield, User, FileText, CheckCircle2, PartyPopper, Ticket, ShieldCheck, ArrowRight } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 const BookingCheckoutPage = () => {
@@ -222,50 +222,114 @@ const BookingCheckoutPage = () => {
     }
   };
 
-  // Success Screen
+  // 3D Animated Success Screen
   if (successData) {
     return (
-      <div className="max-w-2xl mx-auto px-6 py-16 text-center font-sans space-y-8">
-        <div className="flex flex-col items-center gap-3">
-          <CheckCircle2 className="w-20 h-20 text-emerald-500 animate-bounce" />
-          <h1 className="text-4xl font-extrabold tracking-tight text-slate-800">Payment Confirmed!</h1>
-          <p className="text-slate-500 text-sm">
-            Invoice Number: <strong className="text-slate-800">{successData.invoice?.invoiceNumber}</strong>
-          </p>
-        </div>
+      <div className="max-w-3xl mx-auto px-6 py-16 text-center font-sans space-y-10 perspective-1200">
+        {/* Floating 3D Badge & Glow Sphere */}
+        <div className="relative flex flex-col items-center justify-center">
+          {/* Animated 3D Ripple Rings */}
+          <div className="absolute w-36 h-36 rounded-full bg-emerald-500/20 animate-3d-ring pointer-events-none" />
+          <div className="absolute w-48 h-48 rounded-full bg-emerald-400/10 animate-3d-ring [animation-delay:0.4s] pointer-events-none" />
 
-        <div className="glass-panel p-8 rounded-3xl border border-slate-200 flex flex-col items-center gap-6 shadow-md">
-          <div className="text-xs text-slate-500 text-left w-full space-y-2">
-            <p><strong className="text-slate-700">Tour name:</strong> {successData.booking?.tour?.title}</p>
-            <p><strong className="text-slate-700">Departure:</strong> {new Date(successData.booking?.departureDate).toLocaleDateString()}</p>
-            <p><strong className="text-slate-700">Pricing plan:</strong> {successData.booking?.pricingPlanName}</p>
-            <p><strong className="text-slate-700">Total amount:</strong> ${successData.booking?.totalAmount}</p>
-            <p><strong className="text-slate-700">Amount Paid:</strong> ${successData.booking?.amountPaid}</p>
+          {/* Floating 3D Sparkles */}
+          <Sparkles className="absolute -top-4 -left-6 w-7 h-7 text-gold-400 animate-3d-sparkle" />
+          <PartyPopper className="absolute -bottom-2 -right-6 w-8 h-8 text-emerald-400 animate-3d-sparkle [animation-delay:1s]" />
+
+          {/* 3D Checkmark Emblem */}
+          <div className="relative z-10 w-24 h-24 rounded-3xl bg-gradient-to-tr from-emerald-600 via-emerald-500 to-teal-400 p-0.5 shadow-2xl shadow-emerald-500/40 animate-3d-check preserve-3d">
+            <div className="w-full h-full bg-emerald-950/20 backdrop-blur-md rounded-[22px] flex items-center justify-center border border-emerald-300/40">
+              <CheckCircle2 className="w-12 h-12 text-white drop-shadow-[0_10px_20px_rgba(0,0,0,0.3)]" />
+            </div>
+          </div>
+
+          <div className="mt-6 space-y-2 animate-toast-slide-in">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-extrabold uppercase tracking-widest bg-emerald-50 text-emerald-600 border border-emerald-200/80 shadow-sm">
+              <ShieldCheck className="w-3.5 h-3.5" /> Booking Verified & Confirmed
+            </span>
+            <h1 className="text-4xl md:text-5xl font-black tracking-tight text-slate-900 drop-shadow-sm">
+              Payment Successful!
+            </h1>
+            <p className="text-slate-500 text-sm font-medium">
+              Invoice Ref: <strong className="text-slate-800 font-bold px-2 py-0.5 bg-slate-100 rounded-md border border-slate-200">{successData.invoice?.invoiceNumber}</strong>
+            </p>
           </div>
         </div>
 
-        <div className="flex flex-wrap gap-4 justify-center">
-          <a
-            href={`${getBackendUrl()}/api/v1/bookings/${successData.booking?._id}/download-ticket?token=${successData.booking?.secureToken}`}
-            download
-            className="bg-slate-900 hover:bg-slate-800 text-white px-6 py-3 rounded-xl text-sm font-semibold transition-all flex items-center gap-2"
-          >
-            <FileText className="w-4 h-4" /> Download E-Ticket
-          </a>
-          <a
-            href={`${getBackendUrl()}/api/v1/bookings/${successData.booking?._id}/download-itinerary?token=${successData.booking?.secureToken}`}
-            download
-            className="bg-slate-100 hover:bg-slate-200 text-slate-700 px-6 py-3 rounded-xl text-sm font-semibold transition-all flex items-center gap-2 border border-slate-200"
-          >
-            <FileText className="w-4 h-4" /> Download Itinerary
-          </a>
+        {/* 3D Interactive Floating Ticket Card */}
+        <div className="relative group preserve-3d">
+          <div className="animate-3d-card bg-white/90 backdrop-blur-xl p-8 md:p-10 rounded-3xl border border-slate-200/90 shadow-2xl space-y-6 text-left transition-all duration-500 hover:rotate-x-2 hover:-rotate-y-2">
+            <div className="flex items-center justify-between border-b border-slate-150 pb-5">
+              <div className="flex items-center gap-3">
+                <div className="p-3 bg-emerald-500/10 rounded-2xl border border-emerald-500/20">
+                  <Ticket className="w-6 h-6 text-emerald-600" />
+                </div>
+                <div>
+                  <span className="text-[10px] uppercase font-extrabold text-slate-400 tracking-wider block">Official E-Ticket</span>
+                  <h3 className="font-extrabold text-lg text-slate-800 line-clamp-1">
+                    {successData.booking?.tour?.title || 'Tour Experience'}
+                  </h3>
+                </div>
+              </div>
+              <span className="bg-emerald-100 text-emerald-700 font-extrabold text-xs px-3.5 py-1.5 rounded-full border border-emerald-200">
+                Confirmed
+              </span>
+            </div>
 
-          <button
-            onClick={() => navigate('/dashboard/customer')}
-            className="bg-gold-500 hover:bg-gold-600 text-white px-6 py-3 rounded-xl text-sm font-semibold transition-all shadow-md shadow-gold-500/10"
-          >
-            Go to My Dashboard
-          </button>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 py-2">
+              <div className="p-3 bg-slate-50 rounded-2xl border border-slate-150">
+                <span className="text-[10px] text-slate-400 font-bold uppercase block">Departure Date</span>
+                <strong className="text-xs text-slate-800 font-bold">
+                  {new Date(successData.booking?.departureDate).toLocaleDateString()}
+                </strong>
+              </div>
+              <div className="p-3 bg-slate-50 rounded-2xl border border-slate-150">
+                <span className="text-[10px] text-slate-400 font-bold uppercase block">Pricing Tier</span>
+                <strong className="text-xs text-slate-800 font-bold">
+                  {successData.booking?.pricingPlanName || 'Standard'}
+                </strong>
+              </div>
+              <div className="p-3 bg-slate-50 rounded-2xl border border-slate-150">
+                <span className="text-[10px] text-slate-400 font-bold uppercase block">Total Cost</span>
+                <strong className="text-xs text-slate-800 font-bold">
+                  ${successData.booking?.totalAmount}
+                </strong>
+              </div>
+              <div className="p-3 bg-emerald-50 rounded-2xl border border-emerald-150">
+                <span className="text-[10px] text-emerald-600 font-bold uppercase block">Paid Amount</span>
+                <strong className="text-xs text-emerald-700 font-black">
+                  ${successData.booking?.amountPaid}
+                </strong>
+              </div>
+            </div>
+
+            <div className="flex flex-wrap gap-4 pt-4 border-t border-slate-150 justify-between items-center">
+              <div className="flex flex-wrap gap-3">
+                <a
+                  href={`${getBackendUrl()}/api/v1/bookings/${successData.booking?._id}/download-ticket?token=${successData.booking?.secureToken}`}
+                  download
+                  className="bg-slate-900 hover:bg-slate-800 text-white px-5 py-3 rounded-2xl text-xs font-bold transition-all shadow-lg shadow-slate-900/10 flex items-center gap-2 hover:scale-105 active:scale-95"
+                >
+                  <FileText className="w-4 h-4 text-emerald-400" /> Download E-Ticket
+                </a>
+                <a
+                  href={`${getBackendUrl()}/api/v1/bookings/${successData.booking?._id}/download-itinerary?token=${successData.booking?.secureToken}`}
+                  download
+                  className="bg-slate-100 hover:bg-slate-200 text-slate-700 px-5 py-3 rounded-2xl text-xs font-bold transition-all flex items-center gap-2 border border-slate-200 hover:scale-105 active:scale-95"
+                >
+                  <FileText className="w-4 h-4 text-slate-500" /> Download Itinerary
+                </a>
+              </div>
+
+              <button
+                onClick={() => navigate('/dashboard/customer')}
+                className="bg-gradient-to-r from-gold-500 to-gold-600 hover:from-gold-600 hover:to-gold-700 text-white px-6 py-3 rounded-2xl text-xs font-bold transition-all shadow-lg shadow-gold-500/25 flex items-center gap-2 hover:scale-105 active:scale-95 cursor-pointer"
+              >
+                <span>Go to My Dashboard</span>
+                <ArrowRight className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     );

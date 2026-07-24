@@ -210,12 +210,50 @@ function MainApp() {
 
       <Toaster 
         position="top-right"
+        gutter={10}
         toastOptions={{
+          duration: 3500,
+          className: 'animate-toast-slide-in toast-glow',
           style: {
-            background: '#ffffff',
+            background: 'rgba(255, 255, 255, 0.96)',
+            backdropFilter: 'blur(16px)',
             color: '#0f172a',
-            border: '1px solid #e2e8f0',
-            boxShadow: '0 4px 20px rgba(0, 0, 0, 0.08)'
+            border: '1px solid rgba(226, 232, 240, 0.95)',
+            padding: '12px 18px',
+            borderRadius: '1.25rem',
+            fontSize: '0.825rem',
+            fontWeight: '600',
+            boxShadow: '0 20px 40px -10px rgba(15, 23, 42, 0.14), 0 4px 12px -2px rgba(0, 0, 0, 0.04)',
+            letterSpacing: '-0.01em'
+          },
+          success: {
+            duration: 3500,
+            iconTheme: {
+              primary: '#10b981',
+              secondary: '#ffffff'
+            },
+            style: {
+              borderLeft: '4px solid #10b981'
+            }
+          },
+          error: {
+            duration: 4000,
+            iconTheme: {
+              primary: '#f43f5e',
+              secondary: '#ffffff'
+            },
+            style: {
+              borderLeft: '4px solid #f43f5e'
+            }
+          },
+          loading: {
+            iconTheme: {
+              primary: '#3b82f6',
+              secondary: '#ffffff'
+            },
+            style: {
+              borderLeft: '4px solid #3b82f6'
+            }
           }
         }}
       />

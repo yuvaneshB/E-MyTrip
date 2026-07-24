@@ -36,6 +36,7 @@ const AgentDashboard = () => {
       resetFormFields();
     }
     if (tabName === 'tours') {
+      loadAgentData(true);
       navigate('/dashboard/agent');
     } else if (tabName === 'create') {
       navigate('/dashboard/agent/create-tour');
@@ -372,22 +373,34 @@ const AgentDashboard = () => {
     }
   };
 
-  const loadAgentData = async () => {
+  const [dataLoaded, setDataLoaded] = useState(false);
+
+  const loadAgentData = async (force = false) => {
+    if (dataLoaded && !force) return;
     try {
-      const [toursRes, catsRes, destsRes, revsRes] = await Promise.all([
+      const [toursRes, catsRes, destsRes, revsRes] = await Promise.allSettled([
         api.get('/agent-tours'),
         api.get('/tours/categories'),
         api.get('/tours/destinations'),
-        api.get('/reviews/moderation') // Agents/Managers access
+        api.get('/reviews/moderation')
       ]);
 
-      if (toursRes.data.success) setTours(toursRes.data.tours);
-      if (catsRes.data.success) {
-        setCategories(catsRes.data.categories);
-        if (catsRes.data.categories.length > 0) setTourCat(catsRes.data.categories[0]._id);
+      if (toursRes.status === 'fulfilled' && toursRes.value?.data?.success) {
+        setTours(toursRes.value.data.tours);
       }
-      if (destsRes.data.success) setDestinations(destsRes.data.destinations);
-      if (revsRes.data.success) setReviews(revsRes.data.reviews);
+      if (catsRes.status === 'fulfilled' && catsRes.value?.data?.success) {
+        setCategories(catsRes.value.data.categories);
+        if (catsRes.value.data.categories.length > 0 && !tourCat) {
+          setTourCat(catsRes.value.data.categories[0]._id);
+        }
+      }
+      if (destsRes.status === 'fulfilled' && destsRes.value?.data?.success) {
+        setDestinations(destsRes.value.data.destinations);
+      }
+      if (revsRes.status === 'fulfilled' && revsRes.value?.data?.success) {
+        setReviews(revsRes.value.data.reviews);
+      }
+      setDataLoaded(true);
     } catch (err) {
       console.warn('Failed to load agent configurations:', err.message);
     }
@@ -538,12 +551,12 @@ const AgentDashboard = () => {
   };
 
   useEffect(() => {
+    loadAgentData();
     if (activeTab === 'bookings') {
       loadAgentBookings();
     } else if (activeTab === 'staff') {
       loadStaff();
-    } else {
-      loadAgentData();
+    } else if (bookings.length === 0) {
       api.get('/bookings/agent/my-bookings')
         .then(res => {
           if (res.data.success) {
@@ -561,7 +574,7 @@ const AgentDashboard = () => {
       const res = await api.put(`/agent-tours/${tourId}`, { status });
       if (res.data.success) {
         toast.success(`Tour status updated to: ${status}`);
-        loadAgentData();
+        loadAgentData(true);
       }
     } catch (err) {
       toast.error('Failed to update tour status');

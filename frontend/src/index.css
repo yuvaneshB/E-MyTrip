@@ -143,4 +143,131 @@
   animation: chatbot-color-change 3s ease-in-out infinite !important;
 }
 
+/* Attractive Toast Notification Animations */
+@keyframes toastSlideIn {
+  0% {
+    opacity: 0;
+    transform: translateY(-16px) scale(0.92);
+  }
+  60% {
+    opacity: 1;
+    transform: translateY(3px) scale(1.02);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes toastPulseGlow {
+  0%, 100% {
+    box-shadow: 0 10px 30px -5px rgba(37, 99, 235, 0.15);
+  }
+  50% {
+    box-shadow: 0 12px 35px -2px rgba(37, 99, 235, 0.3);
+  }
+}
+
+@keyframes bellSwing {
+  0%, 100% { transform: rotate(0deg); }
+  20% { transform: rotate(14deg); }
+  40% { transform: rotate(-10deg); }
+  60% { transform: rotate(6deg); }
+  80% { transform: rotate(-3deg); }
+}
+
+.animate-toast-slide-in {
+  animation: toastSlideIn 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+.animate-bell-swing {
+  animation: bellSwing 2s ease-in-out infinite;
+  transform-origin: top center;
+}
+
+.toast-glow {
+  animation: toastPulseGlow 3s infinite ease-in-out;
+}
+
+/* 3D Booking Success Keyframe Animations */
+@keyframes pop3DCheck {
+  0% {
+    opacity: 0;
+    transform: scale(0.2) rotateX(-90deg) translateZ(-100px);
+  }
+  60% {
+    opacity: 1;
+    transform: scale(1.15) rotateX(15deg) translateZ(30px);
+  }
+  80% {
+    transform: scale(0.95) rotateX(-5deg) translateZ(10px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) rotateX(0deg) translateZ(0);
+  }
+}
+
+@keyframes float3DCard {
+  0%, 100% {
+    transform: translateY(0px) rotateX(2deg) rotateY(-2deg) translateZ(0);
+    box-shadow: 0 25px 50px -12px rgba(16, 185, 129, 0.22), 0 0 40px rgba(16, 185, 129, 0.12);
+  }
+  50% {
+    transform: translateY(-12px) rotateX(-3deg) rotateY(3deg) translateZ(20px);
+    box-shadow: 0 35px 60px -10px rgba(16, 185, 129, 0.35), 0 0 60px rgba(16, 185, 129, 0.22);
+  }
+}
+
+@keyframes pulse3DRing {
+  0% {
+    transform: scale(0.8);
+    opacity: 0.8;
+  }
+  50% {
+    transform: scale(1.4);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1.6);
+    opacity: 0;
+  }
+}
+
+@keyframes spark3DFloat {
+  0%, 100% {
+    transform: translateY(0) scale(1) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-15px) scale(1.25) rotate(180deg);
+  }
+}
+
+.perspective-1200 {
+  perspective: 1200px;
+}
+
+.preserve-3d {
+  transform-style: preserve-3d;
+}
+
+.animate-3d-check {
+  animation: pop3DCheck 0.85s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+.animate-3d-card {
+  animation: float3DCard 5s ease-in-out infinite;
+  transform-style: preserve-3d;
+}
+
+.animate-3d-ring {
+  animation: pulse3DRing 2.5s ease-out infinite;
+}
+
+.animate-3d-sparkle {
+  animation: spark3DFloat 3s ease-in-out infinite;
+}
+
+
+
 
